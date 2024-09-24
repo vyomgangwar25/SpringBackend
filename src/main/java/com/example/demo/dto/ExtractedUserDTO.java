@@ -3,27 +3,27 @@ package com.example.demo.dto;
 public class ExtractedUserDTO {
 	private String username;
 	private String email;
-
+    private Integer id;
 	public ExtractedUserDTO() {}
 	
-	public ExtractedUserDTO(String username,String email){
+	public ExtractedUserDTO(String username,String email,Integer id){
 		this.username=username;
 		this.email=email;
+		this.id=id;
 	}
-	public void userName(String username) {
-		this.username=username;
-	}
+	
 	public String getUserName()
 	{
 		return username;
 	}
-	public void setEmail(String email)
-	{
-		this.email=email;
-	}
+	 
 	public String getEmail() {
 		return email;
 	}
-	
+	 
+	public Integer getId()
+	{
+		return id;
+	}
 
 }

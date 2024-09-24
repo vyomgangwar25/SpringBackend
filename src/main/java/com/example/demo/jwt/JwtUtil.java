@@ -10,6 +10,7 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.entities.User;
@@ -18,6 +19,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultJwtParserBuilder;
+
+
 
 @Component
 public class JwtUtil 
@@ -33,18 +36,20 @@ public class JwtUtil
 	}
 
 	private SecretKey generateKey(String secret) {
-        // Decode the secret (if it's a Base64 encoded key)
-        byte[] decodedKey = Base64.getDecoder().decode(secret);
-        
-        // Create a SecretKey object
-        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, SignatureAlgorithm.HS256.getJcaName());
-        
-        return secretKey;
-    }
-	
+		// Decode the secret (if it's a Base64 encoded key)
+		byte[] decodedKey = Base64.getDecoder().decode(secret);
+
+		// Create a SecretKey object
+		SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, SignatureAlgorithm.HS256.getJcaName());
+
+		return secretKey;
+	}
+
 	public String generateToken(User userDetails) {
 		Map<String, Object> claims = new HashMap<>();
-		//claims.put("role", claims);
+
+		claims.put("role", userDetails.getRole());
+
 		return createToken(claims, userDetails.getEmail());
 	}
 
@@ -53,7 +58,7 @@ public class JwtUtil
 		return (username.equals(userDetails.getEmail()) && !isTokenExpired(token));
 	}
 
-	
+
 	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
 		final Claims claims = extractAllClaims(token);
 		return claimsResolver.apply(claims);
@@ -68,10 +73,17 @@ public class JwtUtil
 	}
 
 	private Boolean isTokenExpired(String token) {
-		return extractExpiration(token).before(new Date());
+		Boolean isExpired = extractExpiration(token).before(new Date());
+		return isExpired;
 	}
 
 	public Date extractExpiration(String token) {
 		return extractClaim(token, Claims::getExpiration);
+	}
+
+	//token claim extraction:
+	public String extractRole(String token) {
+		Claims claims = extractAllClaims(token);
+		return claims.get("role", String.class);   
 	}
 }

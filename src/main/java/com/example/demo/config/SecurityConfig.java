@@ -4,37 +4,41 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;import com.example.demo.DemoApplication;
+import com.example.demo.filter.CustomClass;
 import com.example.demo.security.ZooFilter;
 
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize
 public class SecurityConfig 
 {
-	@Autowired
-	ZooFilter filter;
-	
-	
+	/**
+	 * password encoder bean
+	 * 
+	 * @return BCryptPasswordEncoder
+	 */
 	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-	     
-	    return new BCryptPasswordEncoder();
+	BCryptPasswordEncoder passwordEncoder() {
+
+		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
-	CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+	CorsConfigurationSource corsConfigurationSource()
+	{
+		CorsConfiguration configuration = new CorsConfiguration(); 
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); 
 		configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));
 		configuration.setAllowCredentials(true);
@@ -43,23 +47,30 @@ public class SecurityConfig
 		return source;
 	}
 
+	/**
+	 * SecurityFilterChain Config {@link DemoApplication}
+	 * 
+	 * @param http
+	 * @return SecurityFilterChain
+	 * @throws Exception
+	 */
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		return http
+	SecurityFilterChain securityFilterChain(HttpSecurity http, ZooFilter filter) throws Exception {
+		HttpSecurity security = http
 				.csrf(csrf -> csrf.disable())
 				.cors(cors -> {
 					cors.configurationSource(corsConfigurationSource());
 				})
-				.httpBasic(httpBasic -> httpBasic.disable())
 				.formLogin((form) -> form.disable())
 				.authorizeHttpRequests((requests) -> requests
-						.requestMatchers("/login", "/registration")
+						.requestMatchers("/login", "/registration","/forget_password")
 						.permitAll()
 						.anyRequest()
 						.authenticated()
 						)
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
-				.build();
+				.httpBasic(httpBasic -> httpBasic.disable());
+		return security.build();
 	}
 }
 

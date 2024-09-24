@@ -1,13 +1,23 @@
 package com.example.demo.entities;
 
+import java.util.Collection;
+import java.util.Collections;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+
 @Entity
-public class User
+public class User implements UserDetails
 {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
@@ -18,43 +28,45 @@ public class User
 	
 	private String password;
 	
+	private String role;
+	
 	public User() {}
 
-	public User(String username,String email, String password) {
+	public User(String username,String email, String password,String role) {
 		this.username=username;
 		this.email = email;
 		this.password = password;
+		this.role=role;
 	}
-	
-	public void setUserName(String username)
+	public void setpassword(String password)
 	{
-		this.username=username;
+		this.password=password;
+	}
+
+	public String getRole()
+	{
+		return role;
 	}
 
 	public String getUsername() {
 		return username;
 	}
-	
-	public void setEmail(String email)
-	{
-		this.email=email;
-	}
 
 	public String getEmail() {
 		return email;
-	}
-	
-	public void setPassowrd(String password)
-	{
-		this.password=password;
 	}
 
 	public String getPassword() {
 		return password;
 	}
-
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public Integer getId()
+	{
+		return id;
+	}
+	
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_"+role));	
 	}
 }
