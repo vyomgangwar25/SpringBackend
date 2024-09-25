@@ -22,13 +22,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 @Scope("prototype")
-public class ZooFilter extends OncePerRequestFilter
-{
-	Integer i = 0;
-	DefaultSecurityFilterChain dfsd;
-	
+public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
+
 	@Autowired
-	JwtUtil  jwtutil;
+	JwtUtil jwtutil;
 
 	@Autowired
 	UserRepository repository;
@@ -40,38 +37,33 @@ public class ZooFilter extends OncePerRequestFilter
 		final String authorizationHeader = request.getHeader("Authorization");
 
 		System.out.println("in Zoo filter");
-		if(authorizationHeader != null)
-		{
+		if (authorizationHeader != null) {
 			String token_frontend = authorizationHeader.substring(7);
-			if(ObjectUtils.isEmpty(token_frontend) || token_frontend.equals("null"))
-			{
+			if (ObjectUtils.isEmpty(token_frontend) || token_frontend.equals("null")) {
 				System.out.println("token null");
 				filterChain.doFilter(request, response);
 				return;
 			}
-			//System.out.print(token_frontend);
+
 			String username = jwtutil.extractUsername(token_frontend);
-			System.out.println("name of user is--> "+username);
+
 			String role = jwtutil.extractRole(token_frontend);
-			System.out.println("role of person is--> "+ role);
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				User userDetails = repository.findByEmail(username);
-				//System.out.print("in fetched userdetails");
-				System.out.println("userDetails are --->"+userDetails.getEmail()+userDetails.getRole());
+
+				System.out.println("userDetails are --->" + userDetails.getEmail() + userDetails.getRole());
 
 				boolean isValid = jwtutil.validateToken(token_frontend, userDetails);
 				if (isValid) {
 					// Set the authentication in the context to mark the user as authenticated
-					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-							userDetails, null,  userDetails.getAuthorities());  
-
+					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+							null, userDetails.getAuthorities());
 
 					// Set the authentication context for Spring Security
-					//  System.out.println(SecurityContextHolder.getContext());
-					System.out.println("details in authToken are -->"+ authToken);
+					// System.out.println(SecurityContextHolder.getContext());
+
 					SecurityContextHolder.getContext().setAuthentication(authToken);
-					System.out.println("details in authToken  and granted authorities are-->"+ authToken);
 
 					System.out.println("Token is valid for user: " + username);
 				} else {
@@ -80,8 +72,7 @@ public class ZooFilter extends OncePerRequestFilter
 			}
 
 		}
-		i++;
-		System.out.println("-----------------" + i);
+
 		filterChain.doFilter(request, response);
 	}
 
