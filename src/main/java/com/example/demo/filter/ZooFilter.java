@@ -1,4 +1,4 @@
-package com.example.demo.security;
+package com.example.demo.filter;
 
 import java.io.IOException;
 
@@ -35,7 +35,7 @@ public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
 			throws ServletException, IOException {
 
 		final String authorizationHeader = request.getHeader("Authorization");
-
+		System.out.println(authorizationHeader);
 		System.out.println("in Zoo filter");
 		if (authorizationHeader != null) {
 			String token_frontend = authorizationHeader.substring(7);
@@ -44,6 +44,7 @@ public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
 				filterChain.doFilter(request, response);
 				return;
 			}
+			  
 
 			String username = jwtutil.extractUsername(token_frontend);
 
@@ -61,6 +62,7 @@ public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
 							null, userDetails.getAuthorities());
 
 					// Set the authentication context for Spring Security
+					System.out.println("inside isvalid block");
 					// System.out.println(SecurityContextHolder.getContext());
 
 					SecurityContextHolder.getContext().setAuthentication(authToken);

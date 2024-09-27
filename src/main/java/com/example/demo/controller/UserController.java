@@ -1,9 +1,13 @@
 package com.example.demo.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -39,7 +44,7 @@ public class UserController {
 
 	@PostMapping("/login")
 	public ResponseEntity<String> handleLogin(@RequestBody UserDTO userInput) {
-		// System.out.println("in login method");
+		 System.out.println("in login method");
 		User existingUser = repository.findByEmail(userInput.email);
 		if (existingUser != null) {
 			// System.out.println(false)
@@ -57,6 +62,7 @@ public class UserController {
 	@PostMapping("/registration")
 	public ResponseEntity<UserDTO> handleRegistration(@RequestBody UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
+			System.out.println(userInput.username);
 			User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),
 					userInput.role);
 
@@ -71,7 +77,7 @@ public class UserController {
 	@PostMapping("/validate_token")
 	public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String tokenHeader) {
 		if (tokenHeader != null) {
-			// System.out.println("in validateToken");
+			 System.out.println("in validateToken");
 			return ResponseEntity.ok("token validation done");
 		}
 
@@ -80,19 +86,32 @@ public class UserController {
 
 	@GetMapping("/extractuser")
 
-	public ResponseEntity<List<ExtractedUserDTO>> extractAllUsers() {
-		// System.out.print("extract user method");
-		List<User> users = repository.findAll();
-		List<ExtractedUserDTO> userDTOs = new ArrayList<>();
-		// System.out.print("in ExtractedUser controllers");
-		for (User user : users) {
+	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page, @RequestParam Integer pagesize) {
+	    PageRequest pageable = PageRequest.of(page, pagesize);
+	    //System.out.println("hello" + pageable);
+	    
+	    
+	    Page<User> pageuser = repository.findAll(pageable);
+	    
+	     
+	    Long totalUsers = repository.count();
+	    System.out.println("Total users in database are=" + totalUsers);
+	    
+	   
+	    List<ExtractedUserDTO> userDTOs = new ArrayList<>();
+	    for (User user : pageuser) {
+	        userDTOs.add(new ExtractedUserDTO(user.getUsername(), user.getEmail(), user.getId())); 
+	    }
 
-			ExtractedUserDTO dto = new ExtractedUserDTO(user.getUsername(), user.getEmail(), user.getId());
-			userDTOs.add(dto);
-		}
-		return ResponseEntity.ok(userDTOs);
+	   
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("users", userDTOs);
+	    response.put("totalUsers", totalUsers);
+	    
 
+	    return ResponseEntity.ok(response);
 	}
+
 
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("deleteUser/{id}")
