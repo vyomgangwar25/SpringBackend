@@ -26,9 +26,12 @@ import com.example.demo.dto.ExtractedUserDTO;
 import com.example.demo.dto.ForgotPasswordRequestDTO;
 import com.example.demo.dto.Newpassword;
 import com.example.demo.dto.UserDTO;
+import com.example.demo.dto.ZooDTO;
 import com.example.demo.entities.User;
+import com.example.demo.entities.Zoo;
 import com.example.demo.jwt.JwtUtil;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.ZooRepository;
 
 @RestController
 public class UserController {
@@ -40,6 +43,9 @@ public class UserController {
 
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
+	
+	@Autowired
+	ZooRepository zoorepository;
 	 
 
 	@PostMapping("/login")
@@ -60,7 +66,7 @@ public class UserController {
 	}
 
 	@PostMapping("/registration")
-	public ResponseEntity<UserDTO> handleRegistration(@RequestBody UserDTO userInput) {
+	public ResponseEntity<?> handleRegistration(@RequestBody UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
 			System.out.println(userInput.username);
 			User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),
@@ -68,10 +74,10 @@ public class UserController {
 
 			repository.save(user);
 
-			return ResponseEntity.ok(userInput);
+			return ResponseEntity.ok("User Registered Successfully");
 		}
 
-		throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists!");
+		return  ResponseEntity.status(409).body("User already exists!");
 	}
 
 	@PostMapping("/validate_token")
@@ -115,7 +121,9 @@ public class UserController {
 
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("deleteUser/{id}")
-	public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
+	public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token, @PathVariable Integer id) {
+		System.out.println("token in delete api is"+token);
+	   jwtutil.extractRole(token);
 		if (repository.existsById(id)) {
 			repository.deleteById(id);
 			// System.out.println("in delete user controller");
@@ -128,16 +136,16 @@ public class UserController {
 
 	}
 
-	@PostMapping("/forget_password")
+	@PostMapping("/forgetpassword")
 	public ResponseEntity<String> forgetPassword(@RequestBody ForgotPasswordRequestDTO email) {
 		System.out.println("in forget passowrd block");
 
 		User existUser = repository.findByEmail(email.getEmail());
-		System.out.println(existUser.getEmail() + existUser.getPassword() + existUser.getUsername());
+		
 		if (existUser == null) {
 			return ResponseEntity.status(404).body("user not found");
 		} else {
-
+			System.out.println(existUser.getEmail() + existUser.getPassword() + existUser.getUsername());
 			String forgetpassToken = jwtutil.generateToken(existUser);
 
 			String url = "http://localhost:3000/setpass?token=" + forgetpassToken;
@@ -164,5 +172,58 @@ public class UserController {
 
 		return ResponseEntity.ok("password change successfully!!");
 	}
+    
+	
+	
 
+	@PostMapping("/zoo")
+	public ResponseEntity<?> zooCreation(@RequestBody ZooDTO zooInput)
+	{
+		//System.out.print("in zoo controller");
+	   Zoo newzoo=new Zoo(zooInput.getName(), zooInput.getLocation(), zooInput.getSize());
+	   zoorepository.save(newzoo);
+		return ResponseEntity.ok(newzoo);
+	}
+	
+	
+	@GetMapping("/extractzoo")
+	public ResponseEntity<HashMap<String,Object>>Extractzoo(@RequestParam Integer page, @RequestParam Integer pagesize)
+	{
+        System.out.print("in extractZoo controller");
+		    PageRequest pageable = PageRequest.of(page, pagesize);
+		    Page<Zoo> pagezoo = zoorepository.findAll(pageable);
+		    Long totalzoo = zoorepository.count();
+		    System.out.print(totalzoo);
+		    
+		    List<ZooDTO>zoodata=new ArrayList<>();
+		    for(Zoo abc:pagezoo)
+		    {
+		    	
+		    zoodata.add(new ZooDTO(abc.getName(),abc.getLocation(),abc.getSize()));
+		    }
+		    HashMap<String, Object> response = new HashMap<>();
+		    response.put("zoodata",zoodata );
+		    response.put("totalzoo", totalzoo);
+		    return ResponseEntity.ok(response);
+ 
+		 
+	}
+	
+	
+	@PreAuthorize("hasRole('admin')")
+	@DeleteMapping("/deletezoo/{id}")
+	public ResponseEntity<?>Detelezoo(@PathVariable Integer id)
+	{  
+		 
+		
+		if(zoorepository.existsById(id))
+		{
+			//System.out.println("in delete zoo controller");
+			zoorepository.deleteById(id);
+			return ResponseEntity.ok("Zoo with a particular id deleted successfully");
+		 
+		}
+		return ResponseEntity.status(404).body("not found");
+		 
+	}
 }

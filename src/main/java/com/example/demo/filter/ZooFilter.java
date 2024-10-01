@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -35,7 +34,7 @@ public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
 			throws ServletException, IOException {
 
 		final String authorizationHeader = request.getHeader("Authorization");
-		System.out.println(authorizationHeader);
+		//System.out.println(authorizationHeader);
 		System.out.println("in Zoo filter");
 		if (authorizationHeader != null) {
 			String token_frontend = authorizationHeader.substring(7);
@@ -47,8 +46,6 @@ public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
 			  
 
 			String username = jwtutil.extractUsername(token_frontend);
-
-			String role = jwtutil.extractRole(token_frontend);
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				User userDetails = repository.findByEmail(username);
