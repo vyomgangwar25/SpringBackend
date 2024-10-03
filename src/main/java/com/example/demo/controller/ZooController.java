@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.ZooDTO;
 import com.example.demo.entities.Zoo;
 import com.example.demo.repository.ZooRepository;
 
 
-
+@RestController
 public class ZooController {
    @Autowired
    ZooRepository zoorepository;
@@ -47,7 +48,7 @@ public class ZooController {
 		    for(Zoo abc:pagezoo)
 		    {
 		    	
-		    zoodata.add(new ZooDTO(abc.getName(),abc.getLocation(),abc.getSize()));
+		    zoodata.add(new ZooDTO(abc.getName(),abc.getLocation(),abc.getSize(),abc.getId()));
 		    }
 		    HashMap<String, Object> response = new HashMap<>();
 		    response.put("zoodata",zoodata );

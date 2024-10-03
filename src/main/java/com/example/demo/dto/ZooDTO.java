@@ -4,13 +4,15 @@ public class ZooDTO {
   private String name;
   private String location;
   private Integer size;
+  private Integer id;
   
-  public ZooDTO() {}
-  public ZooDTO(String name,String location,Integer size)
+  
+  public ZooDTO(String name,String location,Integer size,Integer id)
   {
 	  this.name=name;
 	  this.location=location;
 	  this.size=size;
+	  this.id=id;
   }
 public String getName() {
 	return name;
@@ -29,6 +31,14 @@ public Integer getSize() {
 }
 public void setSize(Integer size) {
 	this.size=size;
+}
+public Integer getId()
+{
+	return id;
+}
+public  void  setId(Integer id)
+{
+	 this.id=id;
 }
  
   

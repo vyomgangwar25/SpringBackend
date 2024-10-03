@@ -15,9 +15,7 @@ public class Zoo {
     private Integer size;
 	
 	
-	public Zoo() {
-		
-	}
+	public Zoo() {}
 	
 	public Zoo(String name,String location,Integer size)
 	{
@@ -57,8 +55,5 @@ public class Zoo {
 	public void setSize(Integer size) {
 		this.size = size;
 	}
-
-	
-	
 
 }
