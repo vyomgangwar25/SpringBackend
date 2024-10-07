@@ -22,14 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
- 
 import com.example.demo.dto.ExtractedUserDTO;
 import com.example.demo.dto.ForgotPasswordRequestDTO;
 import com.example.demo.dto.Newpassword;
 import com.example.demo.dto.UserDTO;
-import com.example.demo.dto.ZooDTO;
 import com.example.demo.entities.User;
-import com.example.demo.entities.Zoo;
 import com.example.demo.jwt.JwtUtil;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.ZooRepository;
@@ -44,14 +41,13 @@ public class UserController {
 
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	ZooRepository zoorepository;
-	 
 
 	@PostMapping("/login")
 	public ResponseEntity<String> handleLogin(@RequestBody UserDTO userInput) {
-		 System.out.println("in login method");
+		System.out.println("in login method");
 		User existingUser = repository.findByEmail(userInput.email);
 		if (existingUser != null) {
 			// System.out.println(false)
@@ -78,14 +74,22 @@ public class UserController {
 			return ResponseEntity.ok("User Registered Successfully");
 		}
 
-		return  ResponseEntity.status(409).body("User already exists!");
+		return ResponseEntity.status(409).body("User already exists!");
 	}
 
 	@PostMapping("/validate_token")
-	public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String tokenHeader) {
+	public ResponseEntity<HashMap<String, Object>> validateToken(@RequestHeader("Authorization") String tokenHeader) {
+
 		if (tokenHeader != null) {
-			 System.out.println("in validateToken");
-			return ResponseEntity.ok("token validation done");
+			String extractToken = tokenHeader.substring(7);
+			String userEmail = jwtutil.extractUsername(extractToken);
+			User details = repository.findByEmail(userEmail);
+
+			HashMap<String, Object> response = new HashMap<>();
+			response.put("name", details.getUsername());
+			response.put("userEmail", jwtutil.extractUsername(extractToken));
+			// System.out.println("in validateToken");
+			return ResponseEntity.ok(response);
 		}
 
 		throw new ResponseStatusException(HttpStatus.CONFLICT, "token not received!");
@@ -93,38 +97,33 @@ public class UserController {
 
 	@GetMapping("/extractuser")
 
-	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page, @RequestParam Integer pagesize) {
-	    PageRequest pageable = PageRequest.of(page, pagesize);
-	    //System.out.println("hello" + pageable);
-	    
-	    
-	    Page<User> pageuser = repository.findAll(pageable);
-	    
-	     
-	    Long totalUsers = repository.count();
-	    System.out.println("Total users in database are=" + totalUsers);
-	    
-	   
-	    List<ExtractedUserDTO> userDTOs = new ArrayList<>();
-	    for (User user : pageuser) {
-	        userDTOs.add(new ExtractedUserDTO(user.getUsername(), user.getEmail(), user.getId())); 
-	    }
+	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page,
+			@RequestParam Integer pagesize) {
+		PageRequest pageable = PageRequest.of(page, pagesize);
+		// System.out.println("hello" + pageable);
 
-	   
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("users", userDTOs);
-	    response.put("totalUsers", totalUsers);
-	    
+		Page<User> pageuser = repository.findAll(pageable);
 
-	    return ResponseEntity.ok(response);
+		Long totalUsers = repository.count();
+		System.out.println("Total users in database are=" + totalUsers);
+
+		List<ExtractedUserDTO> userDTOs = new ArrayList<>();
+		for (User user : pageuser) {
+			userDTOs.add(new ExtractedUserDTO(user.getUsername(), user.getEmail(), user.getId()));
+		}
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("users", userDTOs);
+		response.put("totalUsers", totalUsers);
+
+		return ResponseEntity.ok(response);
 	}
-
 
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("deleteUser/{id}")
 	public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token, @PathVariable Integer id) {
-		System.out.println("token in delete api is"+token);
-	   jwtutil.extractRole(token);
+		System.out.println("token in delete api is" + token);
+		jwtutil.extractRole(token);
 		if (repository.existsById(id)) {
 			repository.deleteById(id);
 			// System.out.println("in delete user controller");
@@ -142,7 +141,7 @@ public class UserController {
 		System.out.println("in forget passowrd block");
 
 		User existUser = repository.findByEmail(email.getEmail());
-		
+
 		if (existUser == null) {
 			return ResponseEntity.status(404).body("user not found");
 		} else {
@@ -160,21 +159,17 @@ public class UserController {
 	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,
 			@RequestBody Newpassword newpassword) {
 
-		String extractToken = tokenHeader.substring(7);    /* extract token from headers */
+		String extractToken = tokenHeader.substring(7); /* extract token from headers */
 
 		String userEmail = jwtutil.extractUsername(extractToken);
 
 		User user = repository.findByEmail(userEmail);
 		String newPassword = newpassword.getnewPassword();
-		String encodedPassword = passwordEncoder.encode(newPassword);   
+		String encodedPassword = passwordEncoder.encode(newPassword);
 
 		user.setpassword(encodedPassword);
 		repository.save(user);
 
 		return ResponseEntity.ok("password change successfully!!");
 	}
-    
-	
-	
- 
 }

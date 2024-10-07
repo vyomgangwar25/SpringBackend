@@ -6,10 +6,8 @@ import jakarta.persistence.Id;
  
 
 @Entity
-public class Zoo {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
+public class Zoo extends CommonEntity
+{
 	private String name;
 	private String location;
     private Integer size;
@@ -23,13 +21,6 @@ public class Zoo {
 		this.location=location;
 		this.size=size;
 		 
-	}
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 	public String getName() {

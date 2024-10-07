@@ -14,13 +14,9 @@ import jakarta.persistence.Id;
 
 
 @Entity
-public class User implements UserDetails
+public class User extends CommonEntity implements UserDetails
 {
 	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
 
 	private String username;
 
@@ -58,11 +54,6 @@ public class User implements UserDetails
 
 	public String getPassword() {
 		return password;
-	}
-	
-	public Integer getId()
-	{
-		return id;
 	}
 	
 	@Override

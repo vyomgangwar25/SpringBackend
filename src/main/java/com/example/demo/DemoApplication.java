@@ -4,6 +4,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.example.demo.entities.User;
+
 /**
  * 
  * Spring main class
@@ -22,6 +24,6 @@ public class DemoApplication implements CommandLineRunner
 	@Override
 	public void run(String... args) throws Exception
 	{
-
+		
 	}
 }

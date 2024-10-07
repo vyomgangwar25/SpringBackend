@@ -21,55 +21,45 @@ import com.example.demo.dto.ZooDTO;
 import com.example.demo.entities.Zoo;
 import com.example.demo.repository.ZooRepository;
 
-
 @RestController
 public class ZooController {
-   @Autowired
-   ZooRepository zoorepository;
+	@Autowired
+	ZooRepository zoorepository;
+
 	@PostMapping("/zoo")
-	public ResponseEntity<?> zooCreation(@RequestBody ZooDTO zooInput)
-	{
-		//System.out.print("in zoo controller");
-	   Zoo newzoo=new Zoo(zooInput.getName(), zooInput.getLocation(), zooInput.getSize());
-	   zoorepository.save(newzoo);
+	public ResponseEntity<?> zooCreation(@RequestBody ZooDTO zooInput) {
+		Zoo newzoo = new Zoo(zooInput.getName(), zooInput.getLocation(), zooInput.getSize());
+		zoorepository.save(newzoo);
 		return ResponseEntity.ok(newzoo);
 	}
-	
+
 	@GetMapping("/extractzoo")
-	public ResponseEntity<HashMap<String,Object>>Extractzoo(@RequestParam Integer page, @RequestParam Integer pagesize)
-	{
-        System.out.print("in extractZoo controller");
-		    PageRequest pageable = PageRequest.of(page, pagesize);
-		    Page<Zoo> pagezoo = zoorepository.findAll(pageable);
-		    Long totalzoo = zoorepository.count();
-		    System.out.print(totalzoo);
-		    
-		    List<ZooDTO>zoodata=new ArrayList<>();
-		    for(Zoo abc:pagezoo)
-		    {
-		    	
-		    zoodata.add(new ZooDTO(abc.getName(),abc.getLocation(),abc.getSize(),abc.getId()));
-		    }
-		    HashMap<String, Object> response = new HashMap<>();
-		    response.put("zoodata",zoodata );
-		    response.put("totalzoo", totalzoo);
-		    return ResponseEntity.ok(response);	 
+	public ResponseEntity<HashMap<String, Object>> Extractzoo(@RequestParam Integer page,
+			@RequestParam Integer pagesize) {
+		// System.out.print("in extractZoo controller");
+		PageRequest pageable = PageRequest.of(page, pagesize);
+		Page<Zoo> pagezoo = zoorepository.findAll(pageable);
+		Long totalzoo = zoorepository.count();
+		System.out.print(totalzoo);
+
+		List<ZooDTO> zoodata = new ArrayList<>();
+		for (Zoo abc : pagezoo) {
+
+			zoodata.add(new ZooDTO(abc.getName(), abc.getLocation(), abc.getSize(), abc.getId()));
+		}
+		HashMap<String, Object> response = new HashMap<>();
+		response.put("zoodata", zoodata);
+		response.put("totalzoo", totalzoo);
+		return ResponseEntity.ok(response);
 	}
-	
+
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("/deletezoo/{id}")
-	public ResponseEntity<?>Detelezoo(@PathVariable Integer id)
-	{  
-		 
-		
-		if(zoorepository.existsById(id))
-		{
-			//System.out.println("in delete zoo controller");
+	public ResponseEntity<?> Detelezoo(@PathVariable Integer id) {
+		if (zoorepository.existsById(id)) {
 			zoorepository.deleteById(id);
 			return ResponseEntity.ok("Zoo with a particular id deleted successfully");
-		 
 		}
 		return ResponseEntity.status(404).body("not found");
-		 
 	}
 }

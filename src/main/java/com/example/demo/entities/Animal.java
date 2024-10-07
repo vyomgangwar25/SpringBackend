@@ -4,18 +4,13 @@ import java.util.Date;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
  
 
 @Entity
-public class Animal {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	 private Integer id;
+public class Animal extends CommonEntity
+{
 	 private String name;
 	 private String gender;
 	 private Date dob;
@@ -33,15 +28,6 @@ public class Animal {
 		   this.dob=dob;
 		   this.zoo=zoo;
 	 }
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -73,6 +59,8 @@ public class Animal {
 	public void setZoo(Zoo zoo) {
 		this.zoo = zoo;
 	}
+
+	 
 	 
 	
 	 

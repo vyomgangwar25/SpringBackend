@@ -9,6 +9,4 @@ import com.example.demo.entities.User;
 public interface UserRepository extends JpaRepository<User, Integer>
 {
 	public User findByEmail(String email);
-	public User findByUsername(String username);
-	//public List<User> findAll();
 }
