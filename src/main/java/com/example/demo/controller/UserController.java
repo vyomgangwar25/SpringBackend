@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.demo.dto.ExtractedUserDTO;
 import com.example.demo.dto.ForgotPasswordRequestDTO;
 import com.example.demo.dto.Newpassword;
+import com.example.demo.dto.UpdatePasswordDTO;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.entities.User;
 import com.example.demo.jwt.JwtUtil;
@@ -94,6 +96,17 @@ public class UserController {
 
 		throw new ResponseStatusException(HttpStatus.CONFLICT, "token not received!");
 	}
+	
+	@PutMapping("/updatepassword")
+	public ResponseEntity<?>passwordUpdate(@RequestHeader("Authorization") String tokenHeader,@RequestBody UpdatePasswordDTO passwordupdate)
+	{
+		String updatedPassword=passwordupdate.getPassword();
+		String encodedPassword = passwordEncoder.encode(updatedPassword);
+
+//		user.setpassword(encodedPassword);
+//		repository.save(user);
+		return null;
+	}
 
 	@GetMapping("/extractuser")
 
@@ -158,7 +171,7 @@ public class UserController {
 	@PostMapping("/setnewpassword")
 	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,
 			@RequestBody Newpassword newpassword) {
-
+  System.out.print("in setpass");
 		String extractToken = tokenHeader.substring(7); /* extract token from headers */
 
 		String userEmail = jwtutil.extractUsername(extractToken);

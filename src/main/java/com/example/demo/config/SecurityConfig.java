@@ -62,7 +62,7 @@ public class SecurityConfig
 				})
 				.formLogin((form) -> form.disable())
 				.authorizeHttpRequests((requests) -> requests
-						.requestMatchers("/login", "/registration","/forget_password","/zoo")
+						.requestMatchers("/login", "/registration","/forgetpassword")
 						.permitAll()
 						.anyRequest()
 						.authenticated()

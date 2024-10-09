@@ -37,12 +37,25 @@ public class AnimalController {
 	@PostMapping("/animalregistration")
 	public ResponseEntity<?> animalCreation(@RequestBody AnimalDTO animalinput) {
 		Zoo zoo = new Zoo();
+		System.out.print("animal");
 		zoo.setId(animalinput.getZooid());
 		Animal animaldata = new Animal(animalinput.getName(), animalinput.getGender(), animalinput.getDob(), zoo);
 		animalRepository.save(animaldata);
 		return null;
 	}
-
+ 
+	
+	@PutMapping("/updateanimal/{id}")
+	public ResponseEntity<?>animalUpdate(@PathVariable Integer id,@RequestBody Animal updateanimal){
+		System.out.print("update animal");
+	Animal animaldata=animalRepository.findById(id).get();
+	animaldata.setName(updateanimal.getName());
+	animaldata.setGender(updateanimal.getGender());
+	animalRepository.save(animaldata);
+	 
+	return ResponseEntity.ok("animal data updated");
+		
+	}
 	@GetMapping("/extractanimal/{id}")
 	public ResponseEntity<?> extractanimalData(@PathVariable Integer id, @RequestParam Integer page,
 			@RequestParam Integer pagesize) {

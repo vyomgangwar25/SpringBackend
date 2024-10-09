@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,6 +54,20 @@ public class ZooController {
 		return ResponseEntity.ok(response);
 	}
 
+	@PutMapping("/updatezoo/{id}")
+	public ResponseEntity<?>Updatezoo(@PathVariable Integer id,@RequestBody ZooDTO updatezoo )
+	{
+		System.out.println("zooupdate");
+		Zoo zoodata= zoorepository.findById(id).get();
+	    zoodata.setName(updatezoo.getName());
+	    zoodata.setLocation(updatezoo.getLocation());
+	    zoodata.setSize(updatezoo.getSize());
+	    zoorepository.save(zoodata);
+		
+		 return ResponseEntity.ok("Zoo data update successfully");
+	}
+	
+	
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("/deletezoo/{id}")
 	public ResponseEntity<?> Detelezoo(@PathVariable Integer id) {

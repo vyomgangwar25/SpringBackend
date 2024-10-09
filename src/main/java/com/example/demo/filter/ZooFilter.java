@@ -36,7 +36,7 @@ public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
 		final String authorizationHeader = request.getHeader("Authorization");
 		//System.out.println(authorizationHeader);
 		System.out.println("in Zoo filter");
-		if (authorizationHeader != null) {
+ 		if (authorizationHeader != null) {
 			String token_frontend = authorizationHeader.substring(7);
 			if (ObjectUtils.isEmpty(token_frontend) || token_frontend.equals("null")) {
 				System.out.println("token null");
