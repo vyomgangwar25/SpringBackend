@@ -15,6 +15,11 @@ public class Zoo extends CommonEntity
 	
 	public Zoo() {}
 	
+	public Zoo(Integer id) 
+	{
+		setId(id);
+	}
+	
 	public Zoo(String name,String location,Integer size)
 	{
 		this.name=name;

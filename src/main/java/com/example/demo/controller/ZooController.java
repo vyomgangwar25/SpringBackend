@@ -37,11 +37,11 @@ public class ZooController {
 	@GetMapping("/extractzoo")
 	public ResponseEntity<HashMap<String, Object>> Extractzoo(@RequestParam Integer page,
 			@RequestParam Integer pagesize) {
-		// System.out.print("in extractZoo controller");
+		 
 		PageRequest pageable = PageRequest.of(page, pagesize);
 		Page<Zoo> pagezoo = zoorepository.findAll(pageable);
 		Long totalzoo = zoorepository.count();
-		System.out.print(totalzoo);
+	 
 
 		List<ZooDTO> zoodata = new ArrayList<>();
 		for (Zoo abc : pagezoo) {

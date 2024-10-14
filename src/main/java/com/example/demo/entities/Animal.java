@@ -6,28 +6,36 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
- 
+
 
 @Entity
 public class Animal extends CommonEntity
 {
-	 private String name;
-	 private String gender;
-	 private Date dob;
-	 @ManyToOne(cascade = CascadeType.MERGE)
+	private String name;
+	private String gender;
+	private Date dob;
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "zoo_id", referencedColumnName = "id")
-	 private Zoo zoo;
-	
-	 
-	 public Animal(){
-	 }
-	 
-	 public Animal(String name,String gender,Date dob,Zoo zoo) {
-		   this.name=name;
-		   this.gender=gender;
-		   this.dob=dob;
-		   this.zoo=zoo;
-	 }
+	private Zoo zoo;
+
+
+	public Animal(){
+	}
+
+	public Animal(String name,String gender,Date dob,Zoo zoo) {
+		this.name=name;
+		this.gender=gender;
+		this.dob=dob;
+		this.zoo=zoo;
+	}
+
+	public Animal(String name,String gender,Date dob, Integer zooId) {
+		this.name=name;
+		this.gender=gender;
+		this.dob=dob;
+		this.zoo = new Zoo(zooId);
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -59,12 +67,4 @@ public class Animal extends CommonEntity
 	public void setZoo(Zoo zoo) {
 		this.zoo = zoo;
 	}
-
-	 
-	 
-	
-	 
-	
-	
-
 }

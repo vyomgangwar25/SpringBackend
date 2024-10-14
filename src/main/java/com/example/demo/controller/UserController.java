@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +35,8 @@ import com.example.demo.jwt.JwtUtil;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.ZooRepository;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class UserController {
 	@Autowired
@@ -48,16 +52,18 @@ public class UserController {
 	ZooRepository zoorepository;
 
 	@PostMapping("/login")
-	public ResponseEntity<String> handleLogin(@RequestBody UserDTO userInput) {
-		System.out.println("in login method");
+	public ResponseEntity<?> handleLogin(@RequestBody UserDTO userInput) {
+		Map<String, String> response = new HashMap<>();
 		User existingUser = repository.findByEmail(userInput.email);
 		if (existingUser != null) {
-			// System.out.println(false)
 
 			if (passwordEncoder.matches(userInput.password, existingUser.getPassword())) {
 				String generated_token = jwtutil.generateToken(existingUser);
-				System.out.println("token is generated and login successfully" + generated_token);
-				return ResponseEntity.ok(generated_token);
+				String role = jwtutil.extractRole(generated_token);
+
+				response.put("token", generated_token);
+				response.put("role", role);
+				return ResponseEntity.ok(response);
 			}
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect Password");
 		}
@@ -65,9 +71,9 @@ public class UserController {
 	}
 
 	@PostMapping("/registration")
-	public ResponseEntity<?> handleRegistration(@RequestBody UserDTO userInput) {
+	public ResponseEntity<?> handleRegistration(@Validated @RequestBody UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
-			System.out.println(userInput.username);
+
 			User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),
 					userInput.role);
 
@@ -90,21 +96,19 @@ public class UserController {
 			HashMap<String, Object> response = new HashMap<>();
 			response.put("name", details.getUsername());
 			response.put("userEmail", jwtutil.extractUsername(extractToken));
-			// System.out.println("in validateToken");
+
 			return ResponseEntity.ok(response);
 		}
 
 		throw new ResponseStatusException(HttpStatus.CONFLICT, "token not received!");
 	}
-	
+
 	@PutMapping("/updatepassword")
-	public ResponseEntity<?>passwordUpdate(@RequestHeader("Authorization") String tokenHeader,@RequestBody UpdatePasswordDTO passwordupdate)
-	{
-		String updatedPassword=passwordupdate.getPassword();
+	public ResponseEntity<?> passwordUpdate(@RequestHeader("Authorization") String tokenHeader,
+			@RequestBody UpdatePasswordDTO passwordupdate) {
+		String updatedPassword = passwordupdate.getPassword();
 		String encodedPassword = passwordEncoder.encode(updatedPassword);
 
-//		user.setpassword(encodedPassword);
-//		repository.save(user);
 		return null;
 	}
 
@@ -113,7 +117,6 @@ public class UserController {
 	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page,
 			@RequestParam Integer pagesize) {
 		PageRequest pageable = PageRequest.of(page, pagesize);
-		// System.out.println("hello" + pageable);
 
 		Page<User> pageuser = repository.findAll(pageable);
 
@@ -134,24 +137,26 @@ public class UserController {
 
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("deleteUser/{id}")
-	public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token, @PathVariable Integer id) {
-		System.out.println("token in delete api is" + token);
-		jwtutil.extractRole(token);
-		if (repository.existsById(id)) {
-			repository.deleteById(id);
-			// System.out.println("in delete user controller");
-			return ResponseEntity.ok("User with given id is deleted successfully");
+	public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String tokenHeader,
+			@PathVariable Integer id) {
+
+		if (tokenHeader != null) {
+			String token2 = tokenHeader.substring(7);
+
+			jwtutil.extractRole(token2);
+			if (repository.existsById(id)) {
+				repository.deleteById(id);
+
+				return ResponseEntity.ok("User  deleted successfully");
+			}
 		}
 
-		else {
-			return ResponseEntity.status(404).body("User not found");
-		}
+		return ResponseEntity.status(404).body("User not found");
 
 	}
 
 	@PostMapping("/forgetpassword")
 	public ResponseEntity<String> forgetPassword(@RequestBody ForgotPasswordRequestDTO email) {
-		System.out.println("in forget passowrd block");
 
 		User existUser = repository.findByEmail(email.getEmail());
 
@@ -171,7 +176,7 @@ public class UserController {
 	@PostMapping("/setnewpassword")
 	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,
 			@RequestBody Newpassword newpassword) {
-  System.out.print("in setpass");
+
 		String extractToken = tokenHeader.substring(7); /* extract token from headers */
 
 		String userEmail = jwtutil.extractUsername(extractToken);

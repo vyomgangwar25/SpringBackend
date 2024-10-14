@@ -36,36 +36,34 @@ public class AnimalController {
 
 	@PostMapping("/animalregistration")
 	public ResponseEntity<?> animalCreation(@RequestBody AnimalDTO animalinput) {
-		Zoo zoo = new Zoo();
-		System.out.print("animal");
-		zoo.setId(animalinput.getZooid());
-		Animal animaldata = new Animal(animalinput.getName(), animalinput.getGender(), animalinput.getDob(), zoo);
+		Animal animaldata = new Animal(animalinput.getName(), animalinput.getGender(), animalinput.getDob(),
+				animalinput.getZooid());
 		animalRepository.save(animaldata);
-		return null;
+		return ResponseEntity.ok("animal registration successful");
 	}
- 
-	
+
 	@PutMapping("/updateanimal/{id}")
-	public ResponseEntity<?>animalUpdate(@PathVariable Integer id,@RequestBody Animal updateanimal){
+	public ResponseEntity<?> animalUpdate(@PathVariable Integer id, @RequestBody Animal updateanimal) {
 		System.out.print("update animal");
-	Animal animaldata=animalRepository.findById(id).get();
-	animaldata.setName(updateanimal.getName());
-	animaldata.setGender(updateanimal.getGender());
-	animalRepository.save(animaldata);
-	 
-	return ResponseEntity.ok("animal data updated");
-		
+		Animal animaldata = animalRepository.findById(id).get();
+		animaldata.setName(updateanimal.getName());
+		animaldata.setGender(updateanimal.getGender());
+		animalRepository.save(animaldata);
+
+		return ResponseEntity.ok("animal data updated");
+
 	}
+
 	@GetMapping("/extractanimal/{id}")
 	public ResponseEntity<?> extractanimalData(@PathVariable Integer id, @RequestParam Integer page,
 			@RequestParam Integer pagesize) {
 
-		// List<Animal> animaldatabyzooid=animalRepository.getByZooId(id);
-
 		PageRequest pageable = PageRequest.of(page, pagesize);
+		Zoo zooid = zooRepository.findById(id).get();
+		String zooname = zooid.getName();
 		Page<Animal> pageAnimal = animalRepository.findByZooId(id, pageable);
 		long animalcount = animalRepository.countByZooId(id);
-		// System.out.println(id);
+
 		System.out.print("animal count is" + animalcount);
 
 		ArrayList<ExtractAnimalDTO> animaldata = new ArrayList<>();
@@ -76,6 +74,7 @@ public class AnimalController {
 		HashMap<String, Object> response = new HashMap<>();
 		response.put("animaldata", animaldata);
 		response.put("animalcount", animalcount);
+		response.put("zooname", zooname);
 
 		return ResponseEntity.ok(response);
 	}
@@ -85,7 +84,7 @@ public class AnimalController {
 	public ResponseEntity<?> deleteanimal(@PathVariable Integer id) {
 		if (animalRepository.existsById(id)) {
 			animalRepository.deleteById(id);
-			return ResponseEntity.ok("user deleted");
+			return ResponseEntity.ok("animal deleted");
 		}
 
 		return ResponseEntity.status(404).body("not found");
@@ -94,10 +93,12 @@ public class AnimalController {
 
 	@GetMapping("/getdropdowndata/{id}")
 	public ResponseEntity<?> extractzoolist(@PathVariable Integer id, @RequestParam Integer animalid) {
-		// System.out.println("get dropdown");
+
 		Animal animaldata = animalRepository.findById(animalid)
 				.orElseThrow(() -> new RuntimeException("Animal not found"));
-		// System.out.print(animal.getName()+ animal.getGender()+"hello");
+		//System.out.println("hello");
+		Integer animalId=animaldata.getZoo().getId();
+		//System.out.println(animaldata.getZoo().getId());
 
 		HashMap<String, Object> response = new HashMap<>();
 		List<Zoo> allZoos = zooRepository.findAll();
@@ -115,7 +116,7 @@ public class AnimalController {
 
 	@PutMapping("/transferanimal")
 	public ResponseEntity<?> animaltransfer(@RequestParam Integer animalid, @RequestParam Integer zooid) {
-		// System.out.print(animalid+" "+zooid);
+		 
 		Animal animal = animalRepository.findById(animalid).orElseThrow(() -> new RuntimeException("Animal not found"));
 		Zoo zoo = zooRepository.findById(zooid).get();
 		animal.setZoo(zoo);
