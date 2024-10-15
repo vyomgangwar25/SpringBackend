@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -35,8 +34,6 @@ import com.example.demo.jwt.JwtUtil;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.ZooRepository;
 
-import jakarta.validation.Valid;
-
 @RestController
 public class UserController {
 	@Autowired
@@ -58,11 +55,12 @@ public class UserController {
 		if (existingUser != null) {
 
 			if (passwordEncoder.matches(userInput.password, existingUser.getPassword())) {
-				String generated_token = jwtutil.generateToken(existingUser);
-				String role = jwtutil.extractRole(generated_token);
-
+				String generated_token = jwtutil.generateToken(existingUser);    
 				response.put("token", generated_token);
-				response.put("role", role);
+				response.put("role", existingUser.getRole());
+				response.put("email", existingUser.getEmail());
+				response.put("name", existingUser.getUsername());
+				 
 				return ResponseEntity.ok(response);
 			}
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect Password");
@@ -85,17 +83,18 @@ public class UserController {
 		return ResponseEntity.status(409).body("User already exists!");
 	}
 
-	@PostMapping("/validate_token")
+	@GetMapping("/validate_token")
 	public ResponseEntity<HashMap<String, Object>> validateToken(@RequestHeader("Authorization") String tokenHeader) {
-
 		if (tokenHeader != null) {
 			String extractToken = tokenHeader.substring(7);
 			String userEmail = jwtutil.extractUsername(extractToken);
 			User details = repository.findByEmail(userEmail);
+			String role=details.getRole();
 
 			HashMap<String, Object> response = new HashMap<>();
 			response.put("name", details.getUsername());
 			response.put("userEmail", jwtutil.extractUsername(extractToken));
+			response.put("role", role);
 
 			return ResponseEntity.ok(response);
 		}
@@ -113,7 +112,6 @@ public class UserController {
 	}
 
 	@GetMapping("/extractuser")
-
 	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page,
 			@RequestParam Integer pagesize) {
 		PageRequest pageable = PageRequest.of(page, pagesize);

@@ -35,7 +35,7 @@ public class AnimalController {
 	ZooRepository zooRepository;
 
 	@PostMapping("/animalregistration")
-	public ResponseEntity<?> animalCreation(@RequestBody AnimalDTO animalinput) {
+	public ResponseEntity<?> animalCreation( @RequestBody AnimalDTO animalinput) {
 		Animal animaldata = new Animal(animalinput.getName(), animalinput.getGender(), animalinput.getDob(),
 				animalinput.getZooid());
 		animalRepository.save(animaldata);
@@ -64,7 +64,7 @@ public class AnimalController {
 		Page<Animal> pageAnimal = animalRepository.findByZooId(id, pageable);
 		long animalcount = animalRepository.countByZooId(id);
 
-		System.out.print("animal count is" + animalcount);
+		 
 
 		ArrayList<ExtractAnimalDTO> animaldata = new ArrayList<>();
 
@@ -91,24 +91,19 @@ public class AnimalController {
 
 	}
 
-	@GetMapping("/getdropdowndata/{id}")
-	public ResponseEntity<?> extractzoolist(@PathVariable Integer id, @RequestParam Integer animalid) {
+	@GetMapping("/getdropdowndata")
+	public ResponseEntity<?> extractzoolist(@RequestParam Integer animalid) {
 
 		Animal animaldata = animalRepository.findById(animalid)
 				.orElseThrow(() -> new RuntimeException("Animal not found"));
-		//System.out.println("hello");
-		Integer animalId=animaldata.getZoo().getId();
-		//System.out.println(animaldata.getZoo().getId());
+
+		Integer zooId = animaldata.getZoo().getId();
+
+		List<Zoo> zoolistexceptid = zooRepository.getZooListById(zooId);
 
 		HashMap<String, Object> response = new HashMap<>();
-		List<Zoo> allZoos = zooRepository.findAll();
-		List<Zoo> filteredZoos = new ArrayList<>();
-		for (Zoo z : allZoos) {
-			if (!z.getId().equals(id)) {
-				filteredZoos.add(z);
-			}
-		}
-		response.put("filteredZoos", filteredZoos);
+
+		response.put("filteredZoos", zoolistexceptid);
 		response.put("animaldata", animaldata);
 		return ResponseEntity.ok(response);
 
@@ -116,7 +111,7 @@ public class AnimalController {
 
 	@PutMapping("/transferanimal")
 	public ResponseEntity<?> animaltransfer(@RequestParam Integer animalid, @RequestParam Integer zooid) {
-		 
+
 		Animal animal = animalRepository.findById(animalid).orElseThrow(() -> new RuntimeException("Animal not found"));
 		Zoo zoo = zooRepository.findById(zooid).get();
 		animal.setZoo(zoo);

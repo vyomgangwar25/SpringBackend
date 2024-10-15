@@ -1,31 +1,32 @@
-package com.example.demo.entities; 
+package com.example.demo.entities;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
  
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
-public class Zoo extends CommonEntity
-{
+public class Zoo extends CommonEntity {
+	@NotBlank(message = "Name is required")
 	private String name;
+
+	@NotBlank(message = "location is required")
 	private String location;
-    private Integer size;
-	
-	
-	public Zoo() {}
-	
-	public Zoo(Integer id) 
-	{
+
+	@NotBlank(message = "size is required")
+	private Integer size;
+
+	public Zoo() {
+	}
+
+	public Zoo(Integer id) {
 		setId(id);
 	}
-	
-	public Zoo(String name,String location,Integer size)
-	{
-		this.name=name;
-		this.location=location;
-		this.size=size;
-		 
+
+	public Zoo(String name, String location, Integer size) {
+		this.name = name;
+		this.location = location;
+		this.size = size;
+
 	}
 
 	public String getName() {

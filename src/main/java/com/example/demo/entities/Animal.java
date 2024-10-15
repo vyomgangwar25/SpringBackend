@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class Animal extends CommonEntity
 {
+	 
 	private String name;
 	private String gender;
 	private Date dob;
