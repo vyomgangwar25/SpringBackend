@@ -55,12 +55,12 @@ public class UserController {
 		if (existingUser != null) {
 
 			if (passwordEncoder.matches(userInput.password, existingUser.getPassword())) {
-				String generated_token = jwtutil.generateToken(existingUser);    
+				String generated_token = jwtutil.generateToken(existingUser);
 				response.put("token", generated_token);
 				response.put("role", existingUser.getRole());
 				response.put("email", existingUser.getEmail());
 				response.put("name", existingUser.getUsername());
-				 
+
 				return ResponseEntity.ok(response);
 			}
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect Password");
@@ -71,15 +71,10 @@ public class UserController {
 	@PostMapping("/registration")
 	public ResponseEntity<?> handleRegistration(@Validated @RequestBody UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
-
-			User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),
-					userInput.role);
-
+   User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),userInput.role);
 			repository.save(user);
-
 			return ResponseEntity.ok("User Registered Successfully");
 		}
-
 		return ResponseEntity.status(409).body("User already exists!");
 	}
 
@@ -89,7 +84,7 @@ public class UserController {
 			String extractToken = tokenHeader.substring(7);
 			String userEmail = jwtutil.extractUsername(extractToken);
 			User details = repository.findByEmail(userEmail);
-			String role=details.getRole();
+			String role = details.getRole();
 
 			HashMap<String, Object> response = new HashMap<>();
 			response.put("name", details.getUsername());
@@ -102,24 +97,12 @@ public class UserController {
 		throw new ResponseStatusException(HttpStatus.CONFLICT, "token not received!");
 	}
 
-	@PutMapping("/updatepassword")
-	public ResponseEntity<?> passwordUpdate(@RequestHeader("Authorization") String tokenHeader,
-			@RequestBody UpdatePasswordDTO passwordupdate) {
-		String updatedPassword = passwordupdate.getPassword();
-		String encodedPassword = passwordEncoder.encode(updatedPassword);
-
-		return null;
-	}
-
 	@GetMapping("/extractuser")
 	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page,
 			@RequestParam Integer pagesize) {
 		PageRequest pageable = PageRequest.of(page, pagesize);
-
 		Page<User> pageuser = repository.findAll(pageable);
-
 		Long totalUsers = repository.count();
-		System.out.println("Total users in database are=" + totalUsers);
 
 		List<ExtractedUserDTO> userDTOs = new ArrayList<>();
 		for (User user : pageuser) {
@@ -135,13 +118,9 @@ public class UserController {
 
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("deleteUser/{id}")
-	public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String tokenHeader,
-			@PathVariable Integer id) {
+	public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String tokenHeader,@PathVariable Integer id) {
 
 		if (tokenHeader != null) {
-			String token2 = tokenHeader.substring(7);
-
-			jwtutil.extractRole(token2);
 			if (repository.existsById(id)) {
 				repository.deleteById(id);
 
@@ -161,7 +140,7 @@ public class UserController {
 		if (existUser == null) {
 			return ResponseEntity.status(404).body("user not found");
 		} else {
-			System.out.println(existUser.getEmail() + existUser.getPassword() + existUser.getUsername());
+
 			String forgetpassToken = jwtutil.generateToken(existUser);
 
 			String url = "http://localhost:3000/setpass?token=" + forgetpassToken;

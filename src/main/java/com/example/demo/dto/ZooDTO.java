@@ -3,13 +3,13 @@ package com.example.demo.dto;
 import jakarta.validation.constraints.NotBlank;
 
 public class ZooDTO {
-	@NotBlank(message = "name is required")
+	 
 	private String name;
 
-	@NotBlank(message = "Location is required")
+	 
 	private String location;
 
-	@NotBlank(message = "size is required")
+	 
 	private Integer size;
 	private Integer id;
 

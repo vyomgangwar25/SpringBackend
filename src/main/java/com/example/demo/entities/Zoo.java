@@ -12,7 +12,7 @@ public class Zoo extends CommonEntity {
 	@NotBlank(message = "location is required")
 	private String location;
 
-	@NotBlank(message = "size is required")
+ 
 	private Integer size;
 
 	public Zoo() {

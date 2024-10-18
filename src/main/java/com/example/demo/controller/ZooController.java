@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,7 +58,7 @@ public class ZooController {
 	@PutMapping("/updatezoo/{id}")
 	public ResponseEntity<?>Updatezoo(@PathVariable Integer id,@RequestBody ZooDTO updatezoo )
 	{
-		System.out.println("zooupdate");
+	 
 		Zoo zoodata= zoorepository.findById(id).get();
 	    zoodata.setName(updatezoo.getName());
 	    zoodata.setLocation(updatezoo.getLocation());
