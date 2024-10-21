@@ -42,11 +42,8 @@ public class ZooController {
 		PageRequest pageable = PageRequest.of(page, pagesize);
 		Page<Zoo> pagezoo = zoorepository.findAll(pageable);
 		Long totalzoo = zoorepository.count();
-	 
-
 		List<ZooDTO> zoodata = new ArrayList<>();
 		for (Zoo abc : pagezoo) {
-
 			zoodata.add(new ZooDTO(abc.getName(), abc.getLocation(), abc.getSize(), abc.getId()));
 		}
 		HashMap<String, Object> response = new HashMap<>();
@@ -71,10 +68,10 @@ public class ZooController {
 	
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("/deletezoo/{id}")
-	public ResponseEntity<?> Detelezoo(@PathVariable Integer id) {
+	public ResponseEntity<String> Detelezoo(@PathVariable Integer id) {
 		if (zoorepository.existsById(id)) {
 			zoorepository.deleteById(id);
-			return ResponseEntity.ok("Zoo with a particular id deleted successfully");
+			return ResponseEntity.ok("Zoo with a given id deleted successfully");
 		}
 		return ResponseEntity.status(404).body("not found");
 	}

@@ -53,7 +53,6 @@ public class UserController {
 		Map<String, String> response = new HashMap<>();
 		User existingUser = repository.findByEmail(userInput.email);
 		if (existingUser != null) {
-
 			if (passwordEncoder.matches(userInput.password, existingUser.getPassword())) {
 				String generated_token = jwtutil.generateToken(existingUser);
 				response.put("token", generated_token);
@@ -69,7 +68,7 @@ public class UserController {
 	}
 
 	@PostMapping("/registration")
-	public ResponseEntity<?> handleRegistration(@Validated @RequestBody UserDTO userInput) {
+	public ResponseEntity<String> handleRegistration(@Validated @RequestBody UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
    User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),userInput.role);
 			repository.save(user);
@@ -140,7 +139,6 @@ public class UserController {
 		if (existUser == null) {
 			return ResponseEntity.status(404).body("user not found");
 		} else {
-
 			String forgetpassToken = jwtutil.generateToken(existUser);
 
 			String url = "http://localhost:3000/setpass?token=" + forgetpassToken;
@@ -155,13 +153,10 @@ public class UserController {
 			@RequestBody Newpassword newpassword) {
 
 		String extractToken = tokenHeader.substring(7); /* extract token from headers */
-
 		String userEmail = jwtutil.extractUsername(extractToken);
-
 		User user = repository.findByEmail(userEmail);
 		String newPassword = newpassword.getnewPassword();
 		String encodedPassword = passwordEncoder.encode(newPassword);
-
 		user.setpassword(encodedPassword);
 		repository.save(user);
 

@@ -44,7 +44,7 @@ public class AnimalController {
 	AnimalTransferHistoryRepository historyRepository;
 
 	@PostMapping("/animalregistration")
-	public ResponseEntity<?> animalCreation( @RequestBody AnimalDTO animalinput) {
+	public ResponseEntity<String> animalCreation( @RequestBody AnimalDTO animalinput) {
 		
 		Animal animaldata = new Animal(animalinput.getName(), animalinput.getGender(), animalinput.getDob(),
 				animalinput.getZooid());
@@ -53,7 +53,7 @@ public class AnimalController {
 	}
 
 	@PutMapping("/updateanimal/{id}")
-	public ResponseEntity<?> animalUpdate(@PathVariable Integer id, @RequestBody Animal updateanimal) {
+	public ResponseEntity<String> animalUpdate(@PathVariable Integer id, @RequestBody Animal updateanimal) {
 	 
 		Animal animaldata = animalRepository.findById(id).get();
 		animaldata.setName(updateanimal.getName());
@@ -65,7 +65,7 @@ public class AnimalController {
 	}
 
 	@GetMapping("/extractanimal/{id}")
-	public ResponseEntity<?> extractanimalData(@PathVariable Integer id, @RequestParam Integer page,
+	public ResponseEntity<HashMap<String,Object>> extractanimalData(@PathVariable Integer id, @RequestParam Integer page,
 			@RequestParam Integer pagesize) {
 
 		PageRequest pageable = PageRequest.of(page, pagesize);
@@ -73,9 +73,6 @@ public class AnimalController {
 		String zooname = zooid.getName();
 		Page<Animal> pageAnimal = animalRepository.findByZooId(id, pageable);
 		long animalcount = animalRepository.countByZooId(id);
-
-		 
-
 		ArrayList<ExtractAnimalDTO> animaldata = new ArrayList<>();
 
 		for (Animal abc : pageAnimal) {
@@ -91,18 +88,17 @@ public class AnimalController {
 
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("/deleteanimal/{id}")
-	public ResponseEntity<?> deleteanimal(@PathVariable Integer id) {
+	public ResponseEntity<String> deleteanimal(@PathVariable Integer id) {
 		if (animalRepository.existsById(id)) {
 			animalRepository.deleteById(id);
 			return ResponseEntity.ok("animal deleted");
 		}
-
 		return ResponseEntity.status(404).body("not found");
 
 	}
 
 	@GetMapping("/getdropdowndata")
-	public ResponseEntity<?> extractzoolist(@RequestParam Integer zooId) {
+	public ResponseEntity<HashMap<String,Object>> extractzoolist(@RequestParam Integer zooId) {
 		List<Zoo> zoolistexceptid = zooRepository.getZooListById(zooId);
 
 		HashMap<String, Object> response = new HashMap<>();
@@ -114,7 +110,7 @@ public class AnimalController {
 	}
 
 	@PutMapping("/transferanimal")
-	public ResponseEntity<?> animaltransfer(@RequestParam Integer animalid, @RequestParam Integer zooid) {
+	public ResponseEntity<String> animaltransfer(@RequestParam Integer animalid, @RequestParam Integer zooid) {
        User user =  (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Animal animal = animalRepository.findById(animalid).orElseThrow(() -> new RuntimeException("Animal not found"));
 		Zoo zoo = zooRepository.findById(zooid).get();

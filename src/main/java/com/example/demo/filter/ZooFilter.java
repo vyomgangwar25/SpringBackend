@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 @Scope("prototype")
-public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
+public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 
 	@Autowired
 	JwtUtil jwtutil;
@@ -34,23 +34,18 @@ public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
 			throws ServletException, IOException {
 
 		final String authorizationHeader = request.getHeader("Authorization");
-	 
- 		if (authorizationHeader != null) {
+
+		if (authorizationHeader != null) {
 			String token_frontend = authorizationHeader.substring(7);
-			 
 			if (ObjectUtils.isEmpty(token_frontend) || token_frontend.equals("null")) {
-				System.out.println("token null");
 				filterChain.doFilter(request, response);
 				return;
 			}
-			  
 
 			String username = jwtutil.extractUsername(token_frontend);
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				User userDetails = repository.findByEmail(username);
-
-				System.out.println("userDetails are --->" + userDetails.getEmail() + userDetails.getRole());
 
 				boolean isValid = jwtutil.validateToken(token_frontend, userDetails);
 				if (isValid) {
@@ -58,13 +53,7 @@ public class ZooFilter extends OncePerRequestFilter {   /* custom filter */
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
 							null, userDetails.getAuthorities());
 
-					// Set the authentication context for Spring Security
-					System.out.println("inside isvalid block");
-					// System.out.println(SecurityContextHolder.getContext());
-
 					SecurityContextHolder.getContext().setAuthentication(authToken);
-
-					System.out.println("Token is valid for user: " + username);
 				} else {
 					System.out.println("Invalid or expired token");
 				}
