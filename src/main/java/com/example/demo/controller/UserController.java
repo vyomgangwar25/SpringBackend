@@ -49,7 +49,7 @@ public class UserController {
 	ZooRepository zoorepository;
 
 	@PostMapping("/login")
-	public ResponseEntity<?> handleLogin(@RequestBody UserDTO userInput) {
+	public ResponseEntity<?> handleLogin(@Validated @RequestBody UserDTO userInput) {
 		Map<String, String> response = new HashMap<>();
 		User existingUser = repository.findByEmail(userInput.email);
 		if (existingUser != null) {
@@ -68,7 +68,7 @@ public class UserController {
 	}
 
 	@PostMapping("/registration")
-	public ResponseEntity<String> handleRegistration(@Validated @RequestBody UserDTO userInput) {
+	public ResponseEntity<String> handleRegistration( @RequestBody UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
    User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),userInput.role);
 			repository.save(user);
@@ -87,9 +87,8 @@ public class UserController {
 
 			HashMap<String, Object> response = new HashMap<>();
 			response.put("name", details.getUsername());
-			response.put("userEmail", jwtutil.extractUsername(extractToken));
+			response.put("userEmail",  userEmail);
 			response.put("role", role);
-
 			return ResponseEntity.ok(response);
 		}
 
@@ -97,8 +96,7 @@ public class UserController {
 	}
 
 	@GetMapping("/extractuser")
-	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page,
-			@RequestParam Integer pagesize) {
+	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page, @RequestParam Integer pagesize) {
 		PageRequest pageable = PageRequest.of(page, pagesize);
 		Page<User> pageuser = repository.findAll(pageable);
 		Long totalUsers = repository.count();
@@ -122,17 +120,15 @@ public class UserController {
 		if (tokenHeader != null) {
 			if (repository.existsById(id)) {
 				repository.deleteById(id);
-
 				return ResponseEntity.ok("User  deleted successfully");
 			}
 		}
-
 		return ResponseEntity.status(404).body("User not found");
 
 	}
 
 	@PostMapping("/forgetpassword")
-	public ResponseEntity<String> forgetPassword(@RequestBody ForgotPasswordRequestDTO email) {
+	public ResponseEntity<String> forgetPassword(@Validated @RequestBody ForgotPasswordRequestDTO email) {
 
 		User existUser = repository.findByEmail(email.getEmail());
 
@@ -149,9 +145,7 @@ public class UserController {
 	}
 
 	@PostMapping("/setnewpassword")
-	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,
-			@RequestBody Newpassword newpassword) {
-
+	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,@RequestBody Newpassword newpassword) {
 		String extractToken = tokenHeader.substring(7); /* extract token from headers */
 		String userEmail = jwtutil.extractUsername(extractToken);
 		User user = repository.findByEmail(userEmail);

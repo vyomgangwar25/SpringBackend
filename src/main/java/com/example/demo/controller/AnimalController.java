@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -116,14 +117,43 @@ public class AnimalController {
 		Zoo zoo = zooRepository.findById(zooid).get();
 		AnimalTransferHistory transferhistroy=new AnimalTransferHistory();
 		transferhistroy.setUser(user);
-		transferhistroy.setFrom_zoo(animal.getZoo());
+		transferhistroy.setFromZoo(animal.getZoo());
 		animal.setZoo(zoo);
-		transferhistroy.setTo_zoo(zoo);
-		transferhistroy.setAnimalid(animal);
+		transferhistroy.setToZoo(zoo);
+		transferhistroy.setAnimalId(animal);
 		transferhistroy.setDate(new Date());
 		animalRepository.save(animal);
 		 historyRepository.save(transferhistroy);	
 		return ResponseEntity.ok("animal Transfered successfully");
 	}
+	
+	@GetMapping("/history/{animalId}")
+	public ResponseEntity<?>animalhistory(@PathVariable Integer animalId)
+	{
+		 Animal animal = animalRepository.findById(animalId).get();
+		 List<AnimalTransferHistory>List=historyRepository.findByanimalId(animal);
+		 System.out.println("List--->"+List.size());
+		 
+		 
+			List<HashMap<String, String>>filteredList=new ArrayList<>();
+		 for(AnimalTransferHistory history:List)
+		 {
+			 HashMap<String,String>data=new HashMap<>();
+			String fromzoo=history.getFromZoo().getName();
+			String tooZoo=history.getToZoo().getName();
+			String animalName=history.getAnimalId().getName() ;
+			String userName=history.getUser().getUsername();
+			data.put("fromzoo", fromzoo);
+			data.put("tooZoo", tooZoo);
+			data.put("animalName", animalName);
+			data.put("userName", userName);
+			filteredList.add(data);
+		 }
+		 
+		return ResponseEntity.ok(filteredList);
+	}
+	
+	
+ 
 
 }

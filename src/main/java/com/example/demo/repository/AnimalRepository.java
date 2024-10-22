@@ -12,5 +12,4 @@ public interface AnimalRepository extends JpaRepository<Animal, Integer> {
     long countByZooId(Integer zooId);
     Page<Animal> findByZooId(Integer zooId, Pageable pageable);
     List<Animal> getByZooId(Integer zooId);
-
 }

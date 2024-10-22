@@ -21,12 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.ZooDTO;
 import com.example.demo.entities.Zoo;
+import com.example.demo.repository.AnimalTransferHistoryRepository;
 import com.example.demo.repository.ZooRepository;
 
 @RestController
 public class ZooController {
 	@Autowired
 	ZooRepository zoorepository;
+	
+	@Autowired
+	AnimalTransferHistoryRepository historyRepository;
 
 	@PostMapping("/zoo")
 	public ResponseEntity<?> zooCreation(@RequestBody ZooDTO zooInput) {
@@ -55,7 +59,6 @@ public class ZooController {
 	@PutMapping("/updatezoo/{id}")
 	public ResponseEntity<?>Updatezoo(@PathVariable Integer id,@RequestBody ZooDTO updatezoo )
 	{
-	 
 		Zoo zoodata= zoorepository.findById(id).get();
 	    zoodata.setName(updatezoo.getName());
 	    zoodata.setLocation(updatezoo.getLocation());
@@ -75,4 +78,6 @@ public class ZooController {
 		}
 		return ResponseEntity.status(404).body("not found");
 	}
+	
+	 
 }
