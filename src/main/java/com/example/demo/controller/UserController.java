@@ -49,8 +49,8 @@ public class UserController {
 	ZooRepository zoorepository;
 
 	@PostMapping("/login")
-	public ResponseEntity<?> handleLogin(@Validated @RequestBody UserDTO userInput) {
-		Map<String, String> response = new HashMap<>();
+	public ResponseEntity<?> handleLogin( @RequestBody UserDTO userInput) {
+		Map<String, Object> response = new HashMap<>();
 		User existingUser = repository.findByEmail(userInput.email);
 		if (existingUser != null) {
 			if (passwordEncoder.matches(userInput.password, existingUser.getPassword())) {
@@ -59,6 +59,7 @@ public class UserController {
 				response.put("role", existingUser.getRole());
 				response.put("email", existingUser.getEmail());
 				response.put("name", existingUser.getUsername());
+				response.put("id", existingUser.getId());
 
 				return ResponseEntity.ok(response);
 			}
@@ -68,7 +69,7 @@ public class UserController {
 	}
 
 	@PostMapping("/registration")
-	public ResponseEntity<String> handleRegistration( @RequestBody UserDTO userInput) {
+	public ResponseEntity<String> handleRegistration(@RequestBody UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
    User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),userInput.role);
 			repository.save(user);
@@ -76,7 +77,19 @@ public class UserController {
 		}
 		return ResponseEntity.status(409).body("User already exists!");
 	}
-
+   
+	
+	@PutMapping("/updateuser/{id}")
+	public ResponseEntity<?>userUpdate(@PathVariable Integer id,@RequestBody UserDTO userDetails)
+	{
+	User user=repository.findById(id).get();
+	System.out.print(userDetails.getEmail());
+	 user.setUsername(userDetails.getUsername());
+	 user.setEmail(userDetails.getEmail());
+	 repository.save(user);
+		return ResponseEntity.ok("Updated");
+	}
+	
 	@GetMapping("/validate_token")
 	public ResponseEntity<HashMap<String, Object>> validateToken(@RequestHeader("Authorization") String tokenHeader) {
 		if (tokenHeader != null) {
@@ -84,11 +97,13 @@ public class UserController {
 			String userEmail = jwtutil.extractUsername(extractToken);
 			User details = repository.findByEmail(userEmail);
 			String role = details.getRole();
+			Integer userId=details.getId();
 
 			HashMap<String, Object> response = new HashMap<>();
 			response.put("name", details.getUsername());
 			response.put("userEmail",  userEmail);
 			response.put("role", role);
+			response.put("id", userId);
 			return ResponseEntity.ok(response);
 		}
 
@@ -128,7 +143,7 @@ public class UserController {
 	}
 
 	@PostMapping("/forgetpassword")
-	public ResponseEntity<String> forgetPassword(@Validated @RequestBody ForgotPasswordRequestDTO email) {
+	public ResponseEntity<String> forgetPassword( @RequestBody ForgotPasswordRequestDTO email) {
 
 		User existUser = repository.findByEmail(email.getEmail());
 

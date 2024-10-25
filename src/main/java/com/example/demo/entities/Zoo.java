@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class Zoo extends CommonEntity {
+	
 	@NotBlank(message = "Name is required")
 	private String name;
 

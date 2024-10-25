@@ -26,20 +26,19 @@ public class AnimalTransferHistory extends CommonEntity {
 	
 	@ManyToOne(cascade=CascadeType.MERGE)
 	@JoinColumn(name="animal_id", referencedColumnName="id")
-	private Animal animalId;
+	private Animal animal;
 	
 	private Date date;
 	
 	public AnimalTransferHistory() {
 	}
 	
-	public AnimalTransferHistory(Zoo fromZoo,Zoo toZoo,User user,Animal animalId,Date date) {
+	public AnimalTransferHistory(Zoo fromZoo, Zoo toZoo, User user, Animal animalId, Date date) {
 		this.fromZoo=fromZoo;
 		this.toZoo=toZoo;
 		this.user=user;
-		this.animalId=animalId;
-		this.date=date;
-		
+		this.animal=animalId;
+		this.date=date;	
 	}
 
 	public Zoo getFromZoo() {
@@ -66,12 +65,12 @@ public class AnimalTransferHistory extends CommonEntity {
 		this.user = user;
 	}
 
-	public Animal getAnimalId() {
-		return animalId;
+	public Animal getAnimal() {
+		return animal;
 	}
 
-	public void setAnimalId(Animal animalId) {
-		this.animalId = animalId;
+	public void setAnimal(Animal animal) {
+		this.animal = animal;
 	}
 
 	public Date getDate() {

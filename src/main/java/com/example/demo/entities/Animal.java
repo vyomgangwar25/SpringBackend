@@ -12,6 +12,7 @@ public class Animal extends CommonEntity {
 	private String name;
 	private String gender;
 	private Date dob;
+	
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "zoo_id", referencedColumnName = "id")
 	private Zoo zoo;
