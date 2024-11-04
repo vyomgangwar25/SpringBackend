@@ -47,7 +47,6 @@ public class AnimalController {
 
 	@PostMapping("/animalregistration")
 	public ResponseEntity<String> animalCreation( @RequestBody AnimalDTO animalinput) {
-
 		Animal animaldata = new Animal(animalinput.getName(), animalinput.getGender(), animalinput.getDob(),
 				animalinput.getZooid());
 		animalRepository.save(animaldata);
@@ -101,9 +100,7 @@ public class AnimalController {
 	@GetMapping("/getdropdowndata")
 	public ResponseEntity<HashMap<String,Object>> extractzoolist(@RequestParam Integer zooId) {
 		List<Zoo> zoolistexceptid = zooRepository.findAllByIdNot(zooId);
-
 		HashMap<String, Object> response = new HashMap<>();
-
 		response.put("filteredZoos", zoolistexceptid);
 		return ResponseEntity.ok(response);
 
@@ -113,45 +110,35 @@ public class AnimalController {
 	public ResponseEntity<String> animaltransfer(@RequestParam Integer animalid, @RequestParam Integer zooid) 
 	{
 		User user =  (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
 		Animal animal = animalRepository.findById(animalid).get();
-
 		Integer fromZooId = animal.getZoo().getId();
-
 		if(zooRepository.existsById(zooid))
 		{
 			Zoo newZoo = zooRepository.findById(zooid).get();
-
 			animal.setZoo(newZoo);
-
 			animalRepository.save(animal);
-
 			Zoo oldZoo = zooRepository.findById(fromZooId).get();
-
 			AnimalTransferHistory transferhistroy=new AnimalTransferHistory(oldZoo, newZoo,user,animal,new Date());
-
 			historyRepository.save(transferhistroy);	
-
 			return ResponseEntity.ok("animal Transfered successfully");
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("zoo not found");
 	}
 
+	
 	@GetMapping(value = "/history/{animalId}")
 	public ResponseEntity<?>animalhistory(@PathVariable Integer animalId)
 	{
 		List<AnimalTransferHistory> historyList = historyRepository.findByAnimalId(animalId);
+		System.out.print(historyList.size());
 		AnimalTransferDataDTO animalTransferdata = new AnimalTransferDataDTO();
 		  if(historyList.size()<=0)
 		  {
 			  return ResponseEntity.status(HttpStatus.NO_CONTENT).body("no history found");
 		  }
 		Animal animal = historyList.get(0).getAnimal(); 
-
 		animalTransferdata.setAnimalData(new AnimalDTO(animal.getName(), animal.getGender(), animal.getDob(), null));
-
 		List<AnimalTransferDTO> listTransferList = new ArrayList<>();
-
 		for(AnimalTransferHistory history : historyList)
 			listTransferList.add(
 					new AnimalTransferDTO(
@@ -162,7 +149,6 @@ public class AnimalController {
 					);
 		
 		animalTransferdata.setTransferHistoryList(listTransferList);
-		
 		return ResponseEntity.ok(animalTransferdata);
 	}
 }

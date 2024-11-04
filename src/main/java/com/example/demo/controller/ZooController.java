@@ -77,7 +77,5 @@ public class ZooController {
 			return ResponseEntity.ok("Zoo with a given id deleted successfully");
 		}
 		return ResponseEntity.status(404).body("not found");
-	}
-	
-	 
+	} 
 }
