@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.sound.midi.SysexMessage;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,13 +27,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.dto.ExtractedUserDTO;
 import com.example.demo.dto.ForgotPasswordRequestDTO;
+import com.example.demo.dto.LoginUserDTO;
 import com.example.demo.dto.Newpassword;
-import com.example.demo.dto.UpdatePasswordDTO;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.entities.User;
 import com.example.demo.jwt.JwtUtil;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.ZooRepository;
+import jakarta.validation.Valid;
 
 @RestController
 public class UserController {
@@ -56,11 +54,11 @@ public class UserController {
 	JavaMailSender mailSender;
 
 	@PostMapping("/login")
-	public ResponseEntity<?> handleLogin( @RequestBody UserDTO userInput) {
+	public ResponseEntity<?> handleLogin(@Valid @RequestBody LoginUserDTO userInput) {
 		Map<String, Object> response = new HashMap<>();
-		User existingUser = repository.findByEmail(userInput.email);
+		User existingUser = repository.findByEmail(userInput.getEmail());
 		if (existingUser != null) {
-			if (passwordEncoder.matches(userInput.password, existingUser.getPassword())) {
+			if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
 				String generated_token = jwtutil.generateToken(existingUser);
 				response.put("token", generated_token);
 				response.put("role", existingUser.getRole());
@@ -76,7 +74,7 @@ public class UserController {
 	}
 
 	@PostMapping("/registration")
-	public ResponseEntity<String> handleRegistration(@RequestBody UserDTO userInput) {
+	public ResponseEntity<String> handleRegistration(@Valid @RequestBody UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
    User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),userInput.role);
 			repository.save(user);
@@ -87,7 +85,7 @@ public class UserController {
    
 	
 	@PutMapping("/updateuser/{id}")
-	public ResponseEntity<?>userUpdate(@PathVariable Integer id,@RequestBody UserDTO userDetails)
+	public ResponseEntity<?>userUpdate(@PathVariable Integer id, @RequestBody UserDTO userDetails)
 	{
 	User user=repository.findById(id).get();
 	 user.setUsername(userDetails.getUsername());
@@ -148,7 +146,7 @@ public class UserController {
 	
 
 	@PostMapping("/forgetpassword")
-	public ResponseEntity<String> forgetPassword( @RequestBody ForgotPasswordRequestDTO email) {
+	public ResponseEntity<String> forgetPassword(@Valid @RequestBody ForgotPasswordRequestDTO email) {
 
 		User existUser = repository.findByEmail(email.getEmail());
 		if (existUser == null) {
@@ -166,7 +164,7 @@ public class UserController {
 	}
 
 	@PostMapping("/setnewpassword")
-	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,@RequestBody Newpassword newpassword) {
+	public ResponseEntity<String> setNewPassword( @RequestHeader("Authorization") String tokenHeader,@Valid  @RequestBody Newpassword newpassword) {
 		String extractToken = tokenHeader.substring(7); /* extract token from headers */
 		String userEmail = jwtutil.extractUsername(extractToken);
 		User user = repository.findByEmail(userEmail);

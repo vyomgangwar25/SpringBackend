@@ -1,30 +1,24 @@
 package com.example.demo.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 
-public class UserDTO 
-{
-	
- 
+public class UserDTO extends LoginUserDTO {
+
+	@NotNull(message = "name must not be empty")
+	@NotBlank(message = "name not be empty")
 	public String username;
-	
-	 
-	public String email;
-	 
- 
-	public String password;
-	 
- 
+
+	@NotNull(message = "enter role")
 	public String role;
 
-	public UserDTO() {}
+	public UserDTO() {
+	}
 
-	public UserDTO(String username,String email, String password,String role) {
-		this.username=username;
-		this.email = email;
-		this.password = password;
-		this.role=role;
+	public UserDTO(String username, String role) {
+		this.username = username;
+
+		this.role = role;
 	}
 
 	public String getUsername() {
@@ -33,22 +27,6 @@ public class UserDTO
 
 	public void setUsername(String username) {
 		this.username = username;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 
 	public String getRole() {

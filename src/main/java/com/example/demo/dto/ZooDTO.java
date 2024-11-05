@@ -1,15 +1,11 @@
 package com.example.demo.dto;
 
-import jakarta.validation.constraints.NotBlank;
+ 
 
 public class ZooDTO {
-	 
+
 	private String name;
-
-	 
 	private String location;
-
-	 
 	private Integer size;
 	private Integer id;
 

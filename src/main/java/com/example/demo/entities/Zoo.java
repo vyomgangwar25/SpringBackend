@@ -27,7 +27,6 @@ public class Zoo extends CommonEntity {
 		this.name = name;
 		this.location = location;
 		this.size = size;
-
 	}
 
 	public String getName() {
