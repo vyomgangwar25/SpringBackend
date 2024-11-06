@@ -1,15 +1,12 @@
-package com.example.demo.controller;
-
+package com.example.demo.controller; 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,11 +15,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.demo.dto.ZooDTO;
+import com.example.demo.dto.ZooRegistrationDTO;
 import com.example.demo.entities.Zoo;
 import com.example.demo.repository.AnimalTransferHistoryRepository;
 import com.example.demo.repository.ZooRepository;
+
+import jakarta.validation.Valid;
 
 @RestController
 public class ZooController {
@@ -33,18 +32,17 @@ public class ZooController {
 	AnimalTransferHistoryRepository historyRepository;
 
 	@PostMapping("/zoo")
-	public ResponseEntity<?> zooCreation(@RequestBody ZooDTO zooInput) {
+	public ResponseEntity<?> zooCreation(@Valid @RequestBody ZooRegistrationDTO zooInput) {
 		Zoo newzoo = new Zoo(zooInput.getName(), zooInput.getLocation(), zooInput.getSize());
 		zoorepository.save(newzoo);
 		return ResponseEntity.ok(newzoo);
 	}
 
 	@GetMapping("/extractzoo")
-	public ResponseEntity<HashMap<String, Object>> Extractzoo(@RequestParam Integer page,
-			@RequestParam Integer pagesize) {
-		 
+	public ResponseEntity<HashMap<String, Object>> Extractzoo(@RequestParam Integer page,@RequestParam Integer pagesize) {
 		PageRequest pageable = PageRequest.of(page, pagesize);
 		Page<Zoo> pagezoo = zoorepository.findAll(pageable);
+//		System.out.println(pagezoo.getSize());
 		Long totalzoo = zoorepository.count();
 		List<ZooDTO> zoodata = new ArrayList<>();
 		for (Zoo abc : pagezoo) {
@@ -57,14 +55,13 @@ public class ZooController {
 	}
 
 	@PutMapping("/updatezoo/{id}")
-	public ResponseEntity<?>Updatezoo(@PathVariable Integer id,@RequestBody ZooDTO updatezoo )
+	public ResponseEntity<?>Updatezoo(@PathVariable Integer id,@Valid @RequestBody ZooRegistrationDTO updatezoo )
 	{
 		Zoo zoodata= zoorepository.findById(id).get();
 	    zoodata.setName(updatezoo.getName());
 	    zoodata.setLocation(updatezoo.getLocation());
 	    zoodata.setSize(updatezoo.getSize());
 	    zoorepository.save(zoodata);
-		
 		 return ResponseEntity.ok("Zoo data update successfully");
 	}
 	

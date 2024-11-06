@@ -1,43 +1,17 @@
 package com.example.demo.dto;
+import jakarta.validation.constraints.NotNull;
 
- 
-
-public class ZooDTO {
-
-	private String name;
-	private String location;
-	private Integer size;
+public class ZooDTO extends ZooRegistrationDTO {
+    
+     
+    @NotNull(message="Integer must not be blank")
 	private Integer id;
-
-	public ZooDTO(String name, String location, Integer size, Integer id) {
-		this.name = name;
-		this.location = location;
-		this.size = size;
+    
+    public ZooDTO(String name, String location, Integer size, Integer id) {
+    	this.location=location;
+    	this.size=size;
+    	this.name=name;
 		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getLocation() {
-		return location;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	public Integer getSize() {
-		return size;
-	}
-
-	public void setSize(Integer size) {
-		this.size = size;
 	}
 
 	public Integer getId() {

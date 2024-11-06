@@ -1,10 +1,13 @@
 package com.example.demo.dto;
 
+import com.example.demo.customAnnotation.UniqueUserName;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class UserDTO extends LoginUserDTO {
-
+	
+	@UniqueUserName
 	@NotNull(message = "name must not be empty")
 	@NotBlank(message = "name not be empty")
 	public String username;
@@ -17,7 +20,6 @@ public class UserDTO extends LoginUserDTO {
 
 	public UserDTO(String username, String role) {
 		this.username = username;
-
 		this.role = role;
 	}
 

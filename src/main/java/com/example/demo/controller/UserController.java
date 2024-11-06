@@ -1,5 +1,4 @@
 package com.example.demo.controller;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,9 +22,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.example.demo.dto.ExtractedUserDTO;
 import com.example.demo.dto.ForgotPasswordRequestDTO;
+import com.example.demo.dto.LoginResponseDTO;
 import com.example.demo.dto.LoginUserDTO;
 import com.example.demo.dto.Newpassword;
 import com.example.demo.dto.UserDTO;
@@ -49,23 +47,20 @@ public class UserController {
 
 	@Autowired
 	ZooRepository zoorepository;
-	
+
 	@Autowired
 	JavaMailSender mailSender;
 
 	@PostMapping("/login")
 	public ResponseEntity<?> handleLogin(@Valid @RequestBody LoginUserDTO userInput) {
-		Map<String, Object> response = new HashMap<>();
+
+		List<LoginResponseDTO> response = new ArrayList<>();
 		User existingUser = repository.findByEmail(userInput.getEmail());
 		if (existingUser != null) {
 			if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
 				String generated_token = jwtutil.generateToken(existingUser);
-				response.put("token", generated_token);
-				response.put("role", existingUser.getRole());
-				response.put("email", existingUser.getEmail());
-				response.put("name", existingUser.getUsername());
-				response.put("id", existingUser.getId());
-
+				response.add(new LoginResponseDTO(generated_token, existingUser.getRole(), existingUser.getEmail(),
+						existingUser.getUsername(), existingUser.getId()));
 				return ResponseEntity.ok(response);
 			}
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect Password");
@@ -76,38 +71,31 @@ public class UserController {
 	@PostMapping("/registration")
 	public ResponseEntity<String> handleRegistration(@Valid @RequestBody UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
-   User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),userInput.role);
+			User user = new User(userInput.username, userInput.email, passwordEncoder.encode(userInput.password),
+					userInput.role);
 			repository.save(user);
 			return ResponseEntity.ok("User Registered Successfully");
 		}
 		return ResponseEntity.status(409).body("User already exists!");
 	}
-   
-	
+
 	@PutMapping("/updateuser/{id}")
-	public ResponseEntity<?>userUpdate(@PathVariable Integer id, @RequestBody UserDTO userDetails)
-	{
-	User user=repository.findById(id).get();
-	 user.setUsername(userDetails.getUsername());
-	 user.setEmail(userDetails.getEmail());
-	 repository.save(user);
+	public ResponseEntity<?> userUpdate(@PathVariable Integer id, @RequestBody UserDTO userDetails) {
+		User user = repository.findById(id).get();
+		user.setUsername(userDetails.getUsername());
+		user.setEmail(userDetails.getEmail());
+		repository.save(user);
 		return ResponseEntity.ok("Updated");
 	}
-	
+
 	@GetMapping("/validate_token")
-	public ResponseEntity<HashMap<String, Object>> validateToken(@RequestHeader("Authorization") String tokenHeader) {
+	public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String tokenHeader) {
 		if (tokenHeader != null) {
 			String extractToken = tokenHeader.substring(7);
 			String userEmail = jwtutil.extractUsername(extractToken);
 			User details = repository.findByEmail(userEmail);
-			String role = details.getRole();
-			Integer userId=details.getId();
-
-			HashMap<String, Object> response = new HashMap<>();
-			response.put("name", details.getUsername());
-			response.put("userEmail",  userEmail);
-			response.put("role", role);
-			response.put("id", userId);
+			List<LoginResponseDTO> response = new ArrayList<>();
+			response.add(new LoginResponseDTO(null, details.getRole(), userEmail, details.getUsername(), details.getId()));
 			return ResponseEntity.ok(response);
 		}
 
@@ -115,7 +103,8 @@ public class UserController {
 	}
 
 	@GetMapping("/extractuser")
-	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page, @RequestParam Integer pagesize) {
+	public ResponseEntity<Map<String, Object>> extractAllUsers(@RequestParam Integer page,
+			@RequestParam Integer pagesize) {
 		PageRequest pageable = PageRequest.of(page, pagesize);
 		Page<User> pageuser = repository.findAll(pageable);
 		Long totalUsers = repository.count();
@@ -133,7 +122,8 @@ public class UserController {
 
 	@PreAuthorize("hasRole('admin')")
 	@DeleteMapping("deleteUser/{id}")
-	public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String tokenHeader,@PathVariable Integer id) {
+	public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String tokenHeader,
+			@PathVariable Integer id) {
 
 		if (tokenHeader != null) {
 			if (repository.existsById(id)) {
@@ -143,7 +133,6 @@ public class UserController {
 		}
 		return ResponseEntity.status(404).body("User not found");
 	}
-	
 
 	@PostMapping("/forgetpassword")
 	public ResponseEntity<String> forgetPassword(@Valid @RequestBody ForgotPasswordRequestDTO email) {
@@ -154,7 +143,7 @@ public class UserController {
 		} else {
 			String forgetpassToken = jwtutil.generateToken(existUser);
 			String url = "http://localhost:3000/setpass?token=" + forgetpassToken;
-			SimpleMailMessage message=new SimpleMailMessage();
+			SimpleMailMessage message = new SimpleMailMessage();
 			message.setTo(email.getEmail());
 			message.setSubject("password Reset Request");
 			message.setText(url);
@@ -164,7 +153,8 @@ public class UserController {
 	}
 
 	@PostMapping("/setnewpassword")
-	public ResponseEntity<String> setNewPassword( @RequestHeader("Authorization") String tokenHeader,@Valid  @RequestBody Newpassword newpassword) {
+	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,
+			@Valid @RequestBody Newpassword newpassword) {
 		String extractToken = tokenHeader.substring(7); /* extract token from headers */
 		String userEmail = jwtutil.extractUsername(extractToken);
 		User user = repository.findByEmail(userEmail);

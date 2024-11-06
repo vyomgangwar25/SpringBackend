@@ -1,11 +1,12 @@
 package com.example.demo.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 public class LoginUserDTO {
 
-	@NotEmpty(message = "email address not valid!!")
+	@Email(message = "email address not valid!!")
 	public String email;
 
 	@Size(min = 6, message = "Password must be at least 6 characters")
