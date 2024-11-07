@@ -55,7 +55,6 @@ public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 					System.out.println("Invalid or expired token");
 				}
 			}
-
 		}
 
 		filterChain.doFilter(request, response);

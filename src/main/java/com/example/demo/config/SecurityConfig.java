@@ -1,6 +1,7 @@
 package com.example.demo.config;
 import java.util.Arrays;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -31,6 +32,12 @@ public class SecurityConfig
 	BCryptPasswordEncoder passwordEncoder() {
 
 		return new BCryptPasswordEncoder();
+	}
+	
+	@Bean
+	ModelMapper modelMapper()
+	{
+	    return new ModelMapper();
 	}
 
 	@Bean
