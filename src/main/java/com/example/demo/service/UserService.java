@@ -1,8 +1,6 @@
 package com.example.demo.service;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,15 +10,16 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.example.demo.dto.ForgotPasswordRequestDTO;
 import com.example.demo.dto.LoginResponseDTO;
 import com.example.demo.dto.LoginUserDTO;
 import com.example.demo.dto.Newpassword;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.entities.User;
+import com.example.demo.enums.ResponseEnum;
 import com.example.demo.jwt.JwtUtil;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.util.UrlConstant;
 
 @Service
 public class UserService {
@@ -32,7 +31,7 @@ public class UserService {
 	
 	@Autowired
 	JavaMailSender mailSender;
-	
+
 	@Autowired
 	JwtUtil jwtutil;
 
@@ -49,9 +48,9 @@ public class UserService {
 						existingUser.getUsername(), existingUser.getId()));
 				return ResponseEntity.ok(response);
 			}
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect Password");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.User_Password.getMessage());
 		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect email");
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.User_Email.getMessage());
 	}
 
 	public ResponseEntity<?> registrationUser(UserDTO userInput) {
@@ -59,9 +58,9 @@ public class UserService {
 			User user = modelMapper.map(userInput, User.class);
 			userInput.setPassword(passwordEncoder.encode(userInput.getPassword()));
 			repository.save(user);
-			return ResponseEntity.ok("User Registered Successfully");
+			return ResponseEntity.ok(ResponseEnum.Registration.getMessage());
 		}
-		return ResponseEntity.status(409).body("User already exists!");
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseEnum.user_Already_exist.getMessage());
 	}
 
 	public ResponseEntity<?> updateUser(Integer id, UserDTO userDetails) {
@@ -69,7 +68,7 @@ public class UserService {
 		user.setUsername(userDetails.getUsername());
 		user.setEmail(userDetails.getEmail());
 		repository.save(user);
-		return ResponseEntity.ok("Updated");
+		return ResponseEntity.ok(ResponseEnum.Update.getMessage());
 	}
 	
 	public ResponseEntity<?>roleStore(String tokenHeader){
@@ -81,8 +80,7 @@ public class UserService {
 			response.add(new LoginResponseDTO(null, details.getRole(), userEmail, details.getUsername(), details.getId()));
 			return ResponseEntity.ok(response);
 		}
-		throw new ResponseStatusException(HttpStatus.CONFLICT, "token not received!");
-		 
+		throw new ResponseStatusException(HttpStatus.CONFLICT, "token not received!"); 
 	}
 	
 	public ResponseEntity<String>forgetPasswordUser(ForgotPasswordRequestDTO email)
@@ -92,7 +90,7 @@ public class UserService {
 			return ResponseEntity.status(404).body("user not found");
 		} else {
 			String forgetpassToken = jwtutil.generateToken(existUser);
-			String url = "http://localhost:3000/setpass?token=" + forgetpassToken;
+			String url = UrlConstant.generateUrl(forgetpassToken);
 			SimpleMailMessage message = new SimpleMailMessage();
 			message.setTo(email.getEmail());
 			message.setSubject("password Reset Request");
@@ -111,6 +109,6 @@ public class UserService {
 		String encodedPassword = passwordEncoder.encode(newPassword);
 		user.setpassword(encodedPassword);
 		repository.save(user);
-		return ResponseEntity.ok("password change successfully!!");
+		return ResponseEntity.ok(ResponseEnum.Chnage_Password.getMessage());
 	}
 }

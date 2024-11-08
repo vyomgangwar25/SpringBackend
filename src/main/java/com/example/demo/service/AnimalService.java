@@ -23,6 +23,7 @@ import com.example.demo.entities.Animal;
 import com.example.demo.entities.AnimalTransferHistory;
 import com.example.demo.entities.User;
 import com.example.demo.entities.Zoo;
+import com.example.demo.enums.ResponseEnum;
 import com.example.demo.repository.AnimalRepository;
 import com.example.demo.repository.AnimalTransferHistoryRepository;
 import com.example.demo.repository.ZooRepository;
@@ -47,7 +48,7 @@ public class AnimalService {
 		Animal newAnimal=modelMapper.map(animalinput,Animal.class);
 		newAnimal.setZoo(zooRepository.findById(animalinput.getZooid()).get());
 		animalRepository.save(newAnimal);
-		return ResponseEntity.ok("animal registration successful");
+		return ResponseEntity.ok(ResponseEnum.Registration.getMessage());
 	}
 	
 	public ResponseEntity<HashMap<String, Object>>extractAnimal(Integer id,Integer page,Integer pagesize)
@@ -71,20 +72,20 @@ public class AnimalService {
 	
 	public ResponseEntity<String>updateAnimalData(Integer id, AnimalUpdateDTO updateanimal)
 	{
-		//pdateanimal.setId(id);
+		//updateanimal.setId(id);
 				Animal animaldata = animalRepository.findById(id).get();
 				animaldata.setName(updateanimal.getName());
 				animaldata.setGender(updateanimal.getGender());
 				animalRepository.save(animaldata);
-				return ResponseEntity.ok("animal data updated");
+				return ResponseEntity.ok(ResponseEnum.Update.getMessage());
 	}
 	
 	public ResponseEntity<String>deleteAnimalData(Integer id){
 		if (animalRepository.existsById(id)) {
 			animalRepository.deleteById(id);
-			return ResponseEntity.ok("animal deleted");
+			return ResponseEntity.ok(ResponseEnum.Delete.getMessage());
 		}
-		return ResponseEntity.status(404).body("not found");
+		return ResponseEntity.status(404).body(ResponseEnum.NotFound.getMessage());
 	}
 	
 	public ResponseEntity<HashMap<String, Object>>zooList(Integer zooId)
@@ -93,7 +94,6 @@ public class AnimalService {
 		HashMap<String, Object> response = new HashMap<>();
 		response.put("filteredZoos", zoolistexceptid);
 		return ResponseEntity.ok(response);
-
 	}
 	
 	public ResponseEntity<String>transferAnimal(Integer animalid,Integer zooid)
@@ -108,9 +108,9 @@ public class AnimalService {
 			Zoo oldZoo = zooRepository.findById(fromZooId).get();
 			AnimalTransferHistory transferhistroy = new AnimalTransferHistory(oldZoo, newZoo, user, animal, new Date());
 			historyRepository.save(transferhistroy);
-			return ResponseEntity.ok("animal Transfered successfully");
+			return ResponseEntity.ok(ResponseEnum.Animal_transfer.getMessage());
 		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("zoo not found");
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseEnum.NotFound.getMessage());
 	}
 	
 	public ResponseEntity<?>historyOfAnimal(Integer animalId){
@@ -118,7 +118,7 @@ public class AnimalService {
 		//System.out.print(historyList.size());
 		AnimalTransferDataDTO animalTransferdata = new AnimalTransferDataDTO();
 		if (historyList.size() <= 0) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("no history found");
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseEnum.NotFound.getMessage());
 		}
 		Animal animal = historyList.get(0).getAnimal();
 		animalTransferdata.setAnimalData(new AnimalDTO(animal.getName(), animal.getGender(), animal.getDob(), null));
@@ -130,5 +130,4 @@ public class AnimalService {
 		animalTransferdata.setTransferHistoryList(listTransferList);
 		return ResponseEntity.ok(animalTransferdata);
 	}
-
 }

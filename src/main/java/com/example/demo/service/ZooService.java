@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.ZooDTO;
 import com.example.demo.dto.ZooRegistrationDTO;
 import com.example.demo.entities.Zoo;
+import com.example.demo.enums.ResponseEnum;
 import com.example.demo.repository.ZooRepository;
 
 @Service
@@ -53,16 +54,14 @@ public class ZooService {
 	    zoodata.setLocation(updatezoo.getLocation());
 	    zoodata.setSize(updatezoo.getSize());
 	    zoorepository.save(zoodata);
-		 return ResponseEntity.ok("Zoo data update successfully");
+		 return ResponseEntity.ok(ResponseEnum.Update.getMessage());
 	}
 	
 	public ResponseEntity<String> deleteZooData(Integer id) {
 		if (zoorepository.existsById(id)) {
 			zoorepository.deleteById(id);
-			return ResponseEntity.ok("Zoo with a given id deleted successfully");
+			return ResponseEntity.ok(ResponseEnum.Delete.getMessage());
 		}
-		return ResponseEntity.status(404).body("not found");
+		return ResponseEntity.status(404).body(ResponseEnum.NotFound.getMessage());
 	} 
-	
-
 }

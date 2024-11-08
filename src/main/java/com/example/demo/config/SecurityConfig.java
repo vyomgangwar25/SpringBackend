@@ -1,6 +1,5 @@
 package com.example.demo.config;
 import java.util.Arrays;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,12 +16,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.example.demo.DemoApplication;
 import com.example.demo.filter.ZooFilter;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize
-public class SecurityConfig 
-{
+public class SecurityConfig {
 	/**
 	 * password encoder bean
 	 * 
@@ -33,19 +30,17 @@ public class SecurityConfig
 
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
-	ModelMapper modelMapper()
-	{
-	    return new ModelMapper();
+	ModelMapper modelMapper() {
+		return new ModelMapper();
 	}
 
 	@Bean
-	CorsConfigurationSource corsConfigurationSource()
-	{
-		CorsConfiguration configuration = new CorsConfiguration(); 
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); 
-		configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS"));
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));
 		configuration.setAllowCredentials(true);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -62,22 +57,16 @@ public class SecurityConfig
 	 */
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http, ZooFilter filter) throws Exception {
-		HttpSecurity security = http
-				.csrf(csrf -> csrf.disable())
-				.cors(cors -> {
-					cors.configurationSource(corsConfigurationSource());
-				})
+		HttpSecurity security = http.csrf(csrf -> csrf.disable()).cors(cors -> {
+			cors.configurationSource(corsConfigurationSource());
+		})
 				.formLogin((form) -> form.disable())
-				.authorizeHttpRequests((requests) -> requests
-						.requestMatchers("/login", "/registration","/forgetpassword")
+				.authorizeHttpRequests(
+						(requests) -> requests.requestMatchers("/login", "/registration", "/forgetpassword")
 						.permitAll()
-						.anyRequest()
-						.authenticated()
-						)
+					   .anyRequest().authenticated())
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
 				.httpBasic(httpBasic -> httpBasic.disable());
 		return security.build();
 	}
 }
-
-

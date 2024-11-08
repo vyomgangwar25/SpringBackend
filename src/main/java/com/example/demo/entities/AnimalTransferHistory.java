@@ -79,8 +79,5 @@ public class AnimalTransferHistory extends CommonEntity {
 
 	public void setDate(Date date) {
 		this.date = date;
-	}
-	
-	  
-
+	}  
 }

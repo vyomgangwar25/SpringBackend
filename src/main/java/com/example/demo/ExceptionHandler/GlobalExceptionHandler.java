@@ -25,7 +25,7 @@ public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgu
         errors.put(fieldName, errorMessage);
     });
 
-    // Return a ResponseEntity with the map of errors and a 400 status code
+    
     return ResponseEntity.badRequest().body(errors);
 }
 }

@@ -15,7 +15,6 @@ import com.example.demo.dto.AnimalDTO;
 import com.example.demo.dto.AnimalUpdateDTO;
 import com.example.demo.service.AnimalService;
 
-import jakarta.validation.Valid;
 
 @RestController
 public class AnimalController {
