@@ -34,6 +34,9 @@ public class User extends CommonEntity implements UserDetails {
 	public void setpassword(String password) {
 		this.password = password;
 	}
+	public void setRole(String role) {
+		 this.role=role;
+	}
 
 	public String getRole() {
 		return role;
@@ -58,6 +61,8 @@ public class User extends CommonEntity implements UserDetails {
 	public String getPassword() {
 		return password;
 	}
+	
+	
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

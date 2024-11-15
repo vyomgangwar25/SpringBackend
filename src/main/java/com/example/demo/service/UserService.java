@@ -1,25 +1,26 @@
 package com.example.demo.service;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import com.example.demo.dto.ForgotPasswordRequestDTO;
 import com.example.demo.dto.LoginResponseDTO;
 import com.example.demo.dto.LoginUserDTO;
-import com.example.demo.dto.Newpassword;
 import com.example.demo.dto.UserDTO;
+import com.example.demo.entities.Roles;
 import com.example.demo.entities.User;
 import com.example.demo.enums.ResponseEnum;
 import com.example.demo.jwt.JwtUtil;
+import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.util.UrlConstant;
+
+import jakarta.validation.Valid;
 
 @Service
 public class UserService {
@@ -27,13 +28,16 @@ public class UserService {
 	private UserRepository repository;
 
 	@Autowired
-	private BCryptPasswordEncoder passwordEncoder;
-	
-	@Autowired
-	JavaMailSender mailSender;
+	private RoleRepository roleRepository;
 
 	@Autowired
-	JwtUtil jwtutil;
+	private BCryptPasswordEncoder passwordEncoder;
+
+	@Autowired
+	private Email emailSevice;
+
+	@Autowired
+	private JwtUtil jwtutil;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -53,60 +57,60 @@ public class UserService {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.User_Email.getMessage());
 	}
 
-	public ResponseEntity<?> registrationUser(UserDTO userInput) {
+	public ResponseEntity<String> registrationUser(UserDTO userInput) {
 		if (repository.findByEmail(userInput.email) == null) {
 			User user = modelMapper.map(userInput, User.class);
-			userInput.setPassword(passwordEncoder.encode(userInput.getPassword()));
+			user.setpassword(passwordEncoder.encode(userInput.getPassword()));
 			repository.save(user);
 			return ResponseEntity.ok(ResponseEnum.Registration.getMessage());
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseEnum.user_Already_exist.getMessage());
 	}
 
-	public ResponseEntity<?> updateUser(Integer id, UserDTO userDetails) {
+	public ResponseEntity<List<Roles>> fetchRoles() {
+		List<Roles> allroles = roleRepository.findAll();
+		return ResponseEntity.ok(allroles);
+	}
+
+	public ResponseEntity<String> updateUser(Integer id, UserDTO userDetails) {
 		User user = repository.findById(id).get();
 		user.setUsername(userDetails.getUsername());
 		user.setEmail(userDetails.getEmail());
 		repository.save(user);
 		return ResponseEntity.ok(ResponseEnum.Update.getMessage());
 	}
-	
-	public ResponseEntity<?>roleStore(String tokenHeader){
+
+	public ResponseEntity<?> roleStore(String tokenHeader) {
 		if (tokenHeader != null) {
 			String extractToken = tokenHeader.substring(7);
 			String userEmail = jwtutil.extractUsername(extractToken);
 			User details = repository.findByEmail(userEmail);
 			List<LoginResponseDTO> response = new ArrayList<>();
-			response.add(new LoginResponseDTO(null, details.getRole(), userEmail, details.getUsername(), details.getId()));
+			response.add(
+					new LoginResponseDTO(null, details.getRole(), userEmail, details.getUsername(), details.getId()));
 			return ResponseEntity.ok(response);
 		}
-		throw new ResponseStatusException(HttpStatus.CONFLICT, "token not received!"); 
+		throw new ResponseStatusException(HttpStatus.CONFLICT, "token not received!");
 	}
-	
-	public ResponseEntity<String>forgetPasswordUser(ForgotPasswordRequestDTO email)
-	{
-		User existUser = repository.findByEmail(email.getEmail());
+
+	public ResponseEntity<String> forgetPasswordUser(@Valid String email) {
+		User existUser = repository.findByEmail(email);
 		if (existUser == null) {
 			return ResponseEntity.status(404).body("user not found");
 		} else {
 			String forgetpassToken = jwtutil.generateToken(existUser);
 			String url = UrlConstant.generateUrl(forgetpassToken);
-			SimpleMailMessage message = new SimpleMailMessage();
-			message.setTo(email.getEmail());
-			message.setSubject("password Reset Request");
-			message.setText(url);
-			mailSender.send(message);
+			String subject = "Update Password Request";
+			emailSevice.sendMail(email, subject, url);
 			return ResponseEntity.ok(url);
 		}
 	}
-	
-	public ResponseEntity<String>newPassowrd(String tokenHeader,Newpassword newpassword)
-	{
+
+	public ResponseEntity<String> newPassowrd(String tokenHeader, String newpassword) {
 		String extractToken = tokenHeader.substring(7); /* extract token from headers */
 		String userEmail = jwtutil.extractUsername(extractToken);
 		User user = repository.findByEmail(userEmail);
-		String newPassword = newpassword.getnewPassword();
-		String encodedPassword = passwordEncoder.encode(newPassword);
+		String encodedPassword = passwordEncoder.encode(newpassword);
 		user.setpassword(encodedPassword);
 		repository.save(user);
 		return ResponseEntity.ok(ResponseEnum.Chnage_Password.getMessage());

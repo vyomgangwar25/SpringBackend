@@ -25,7 +25,7 @@ public class ZooService {
 	 @Autowired
 	 private ModelMapper modelMapper;
 	 
-	public ResponseEntity<?> zooRegistration(ZooRegistrationDTO zooInput)
+	public ResponseEntity<Zoo> zooRegistration(ZooRegistrationDTO zooInput)
 	{
 		Zoo newZoo=modelMapper.map(zooInput,Zoo.class);
 		zoorepository.save(newZoo);
@@ -47,7 +47,7 @@ public class ZooService {
 		return ResponseEntity.ok(response);	
 	}
 	
-	public ResponseEntity<?>updateZooData(Integer id,ZooRegistrationDTO updatezoo)
+	public ResponseEntity<String>updateZooData(Integer id,ZooRegistrationDTO updatezoo)
 	{
 		Zoo zoodata= zoorepository.findById(id).get();
 	    zoodata.setName(updatezoo.getName());

@@ -5,19 +5,17 @@ import com.example.demo.repository.UserRepository;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+ 
 
 public class UniqueUserNameValidator implements ConstraintValidator<UniqueUserName, String>  {
-  @Autowired
-    UserRepository repository;
+	@Autowired
+	UserRepository repository;
 	@Override
 	public boolean isValid(String username, ConstraintValidatorContext context) {
 		if(username==null || username.trim().isEmpty())
 		{
 			return true;
 		}
-		return !repository.existsByUsername(username);
-		 
-		 
+		return !repository.existsByUsername(username);  
 	}
-
 }

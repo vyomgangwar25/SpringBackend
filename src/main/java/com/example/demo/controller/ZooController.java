@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.ZooRegistrationDTO;
+import com.example.demo.entities.Zoo;
 import com.example.demo.service.ZooService;
 
 import jakarta.validation.Valid;
@@ -23,7 +24,7 @@ public class ZooController {
 	private ZooService zooService;
 
 	@PostMapping("/zoo")
-	public ResponseEntity<?> zooCreation(@Valid @RequestBody ZooRegistrationDTO zooInput) {
+	public ResponseEntity<Zoo> zooCreation(@Valid @RequestBody ZooRegistrationDTO zooInput) {
 		return  zooService.zooRegistration(zooInput);
 	}
 
@@ -33,7 +34,7 @@ public class ZooController {
 	}
 
 	@PutMapping("/updatezoo/{id}")
-	public ResponseEntity<?>Updatezoo(@PathVariable Integer id,@Valid @RequestBody ZooRegistrationDTO updatezoo ){
+	public ResponseEntity<String>Updatezoo(@PathVariable Integer id,@Valid @RequestBody ZooRegistrationDTO updatezoo ){
 		return zooService.updateZooData(id, updatezoo);
 	}
 	

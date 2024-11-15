@@ -1,5 +1,6 @@
 package com.example.demo.config;
 import java.util.Arrays;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.demo.DemoApplication;
+import com.example.demo.enums.EndPoint;
 import com.example.demo.filter.ZooFilter;
 
 @Configuration
@@ -30,7 +32,12 @@ public class SecurityConfig {
 
 		return new BCryptPasswordEncoder();
 	}
-
+   
+	/**
+	 * ModelMapper bean
+	 * 
+	 * @return ModelMapper
+	 */
 	@Bean
 	ModelMapper modelMapper() {
 		return new ModelMapper();
@@ -62,11 +69,10 @@ public class SecurityConfig {
 		})
 				.formLogin((form) -> form.disable())
 				.authorizeHttpRequests(
-						(requests) -> requests.requestMatchers("/login", "/registration", "/forgetpassword")
-						.permitAll()
+						(requests) -> requests.requestMatchers(EndPoint.getEndPointsArray()).permitAll()
 					   .anyRequest().authenticated())
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
 				.httpBasic(httpBasic -> httpBasic.disable());
 		return security.build();
-	}
+	} 
 }
