@@ -9,7 +9,7 @@ import com.example.demo.entities.AnimalTransferHistory;
 @Repository
 public interface AnimalTransferHistoryRepository extends JpaRepository<AnimalTransferHistory, Integer>
 {
-	List<AnimalTransferHistory> findByAnimalId(Integer id);	 
+	public List<AnimalTransferHistory> findByAnimalId(Integer id);	 
 }
  
 

@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import com.example.demo.dto.LoginResponseDTO;
 import com.example.demo.dto.LoginUserDTO;
 import com.example.demo.dto.UserDTO;
@@ -20,13 +22,8 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.util.UrlConstant;
 
-import jakarta.validation.Valid;
-
 @Service
-public class UserService {
-	@Autowired
-	private UserRepository repository;
-
+public class UserService extends AbstractService<UserRepository> {
 	@Autowired
 	private RoleRepository roleRepository;
 
@@ -34,7 +31,7 @@ public class UserService {
 	private BCryptPasswordEncoder passwordEncoder;
 
 	@Autowired
-	private Email emailSevice;
+	private EmailService emailService;
 
 	@Autowired
 	private JwtUtil jwtutil;
@@ -42,9 +39,9 @@ public class UserService {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	public ResponseEntity<?> loginUser(LoginUserDTO userInput) {
+	public ResponseEntity<?> login(LoginUserDTO userInput) {
 		List<LoginResponseDTO> response = new ArrayList<>();
-		User existingUser = repository.findByEmail(userInput.getEmail());
+		User existingUser = getRepository().findByEmail(userInput.getEmail());
 		if (existingUser != null) {
 			if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
 				String generated_token = jwtutil.generateToken(existingUser);
@@ -52,56 +49,56 @@ public class UserService {
 						existingUser.getUsername(), existingUser.getId()));
 				return ResponseEntity.ok(response);
 			}
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.User_Password.getMessage());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_PASSWORD.getMessage());
 		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.User_Email.getMessage());
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_EMAIL.getMessage());
 	}
 
-	public ResponseEntity<String> registrationUser(UserDTO userInput) {
-		if (repository.findByEmail(userInput.email) == null) {
+	public ResponseEntity<String> registration(UserDTO userInput) {
+		if (getRepository().findByEmail(userInput.email) == null) {
 			User user = modelMapper.map(userInput, User.class);
 			user.setpassword(passwordEncoder.encode(userInput.getPassword()));
-			repository.save(user);
-			return ResponseEntity.ok(ResponseEnum.Registration.getMessage());
+			getRepository().save(user);
+			return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
 		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseEnum.user_Already_exist.getMessage());
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseEnum.ALREADY_EXIST.getMessage());
 	}
 
-	public ResponseEntity<List<Roles>> fetchRoles() {
+	public ResponseEntity<List<Roles>> roles() {
 		List<Roles> allroles = roleRepository.findAll();
 		return ResponseEntity.ok(allroles);
 	}
 
-	public ResponseEntity<String> updateUser(Integer id, UserDTO userDetails) {
-		User user = repository.findById(id).get();
+	public ResponseEntity<String> update(Integer id, UserDTO userDetails) {
+		User user = getRepository().findById(id).get();
 		user.setUsername(userDetails.getUsername());
 		user.setEmail(userDetails.getEmail());
-		repository.save(user);
-		return ResponseEntity.ok(ResponseEnum.Update.getMessage());
+		getRepository().save(user);
+		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
 
-	public ResponseEntity<?> roleStore(String tokenHeader) {
+	public ResponseEntity<?> userInfo(String tokenHeader) {
 		if (tokenHeader != null) {
 			String extractToken = tokenHeader.substring(7);
 			String userEmail = jwtutil.extractUsername(extractToken);
-			User details = repository.findByEmail(userEmail);
+			User details = getRepository().findByEmail(userEmail);
 			List<LoginResponseDTO> response = new ArrayList<>();
 			response.add(
 					new LoginResponseDTO(null, details.getRole(), userEmail, details.getUsername(), details.getId()));
 			return ResponseEntity.ok(response);
 		}
-		throw new ResponseStatusException(HttpStatus.CONFLICT, "token not received!");
+		throw new ResponseStatusException(HttpStatus.CONFLICT, ResponseEnum.TOKEN_NOT_RECEIVED.getMessage());
 	}
 
-	public ResponseEntity<String> forgetPasswordUser(@Valid String email) {
-		User existUser = repository.findByEmail(email);
+	public ResponseEntity<String> forgetPassword(String email) {
+		User existUser = getRepository().findByEmail(email);
 		if (existUser == null) {
-			return ResponseEntity.status(404).body("user not found");
+			return ResponseEntity.status(404).body(ResponseEnum.USER_NOT_FOUND.getMessage());
 		} else {
 			String forgetpassToken = jwtutil.generateToken(existUser);
 			String url = UrlConstant.generateUrl(forgetpassToken);
-			String subject = "Update Password Request";
-			emailSevice.sendMail(email, subject, url);
+			String subject = ResponseEnum.UPDATE_PASSWORD_REQUEST.getMessage();
+			emailService.sendMail(email, subject, url);
 			return ResponseEntity.ok(url);
 		}
 	}
@@ -109,10 +106,10 @@ public class UserService {
 	public ResponseEntity<String> newPassowrd(String tokenHeader, String newpassword) {
 		String extractToken = tokenHeader.substring(7); /* extract token from headers */
 		String userEmail = jwtutil.extractUsername(extractToken);
-		User user = repository.findByEmail(userEmail);
+		User user = getRepository().findByEmail(userEmail);
 		String encodedPassword = passwordEncoder.encode(newpassword);
 		user.setpassword(encodedPassword);
-		repository.save(user);
-		return ResponseEntity.ok(ResponseEnum.Chnage_Password.getMessage());
+		getRepository().save(user);
+		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}
 }

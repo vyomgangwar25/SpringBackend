@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 import java.util.HashMap;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,53 +9,52 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.example.demo.dto.AnimalDTO;
 import com.example.demo.dto.AnimalUpdateDTO;
 import com.example.demo.service.AnimalService;
 
-
 @RestController
-public class AnimalController {
-
-	@Autowired
-	private AnimalService animalService;
-
-	@PostMapping("/animalregistration")
-	public ResponseEntity<String> animalCreation(@RequestBody AnimalDTO animalinput) {
-		return animalService.animalRegistration(animalinput);	
+@RequestMapping("/animal")
+public class AnimalController extends AbstractController<AnimalService>
+{
+	@PostMapping("/create")
+	public ResponseEntity<String> create(@RequestBody AnimalDTO animalinput) {
+		return getService().registration(animalinput);
 	}
 
-	@GetMapping("/extractanimal/{id}")
-	public ResponseEntity<HashMap<String, Object>> extractanimalData(@PathVariable Integer id,
+	@GetMapping("/list/{id}")
+	public ResponseEntity<HashMap<String, Object>> list(@PathVariable Integer id,
 			@RequestParam Integer page, @RequestParam Integer pagesize) {
-		return animalService.extractAnimal(id, page, pagesize);	
+		return getService().extract(id, page, pagesize);
 	}
 
-	@PutMapping("/updateanimal/{id}")
-	public ResponseEntity<String> animalUpdate(@PathVariable Integer id, @RequestBody AnimalUpdateDTO updateanimal) {
-		return animalService.updateAnimalData(id, updateanimal);
+	@PutMapping("/update/{id}")
+	public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody AnimalUpdateDTO updateanimal) {
+		return getService().update(id, updateanimal);
 	}
 
-	@PreAuthorize("hasRole('admin')")
-	@DeleteMapping("/deleteanimal/{id}")
-	public ResponseEntity<String> deleteanimal(@PathVariable Integer id) {
-		return animalService.deleteAnimalData(id);
+	@PreAuthorize("hasAuthority('AUTHORITY_3')")
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<String> delete(@PathVariable Integer id) {
+		return getService().delete(id);
 	}
 
-	@GetMapping("/getdropdowndata")
-	public ResponseEntity<HashMap<String, Object>> extractzoolist(@RequestParam Integer zooId) {
-		return animalService.zooList(zooId);	
+	@GetMapping("/zoolist")
+	public ResponseEntity<HashMap<String, Object>> dropDownList(@RequestParam Integer zooId) {
+		return getService().zoolist(zooId);
 	}
 
-	@PutMapping("/transferanimal")
-	public ResponseEntity<String> animaltransfer(@RequestParam Integer animalid, @RequestParam Integer zooid) {
-		return animalService.transferAnimal(animalid, zooid);
+	@PutMapping("/transfer")
+	public ResponseEntity<String> transfer(@RequestParam Integer animalid, @RequestParam Integer zooid) {
+		return getService().transfer(animalid, zooid);
 	}
 
-	@GetMapping(value = "/history/{animalId}")
-	public ResponseEntity<?> animalhistory(@PathVariable Integer animalId) {
-		return animalService.historyOfAnimal(animalId);	
+	@GetMapping("/history/{animalId}")
+	public ResponseEntity<?> history(@PathVariable Integer animalId) {
+		return getService().history(animalId);
 	}
 }

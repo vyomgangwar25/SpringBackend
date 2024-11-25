@@ -2,15 +2,18 @@ package com.example.demo.enums;
 
 public enum ResponseEnum
 {
-	User_Email("Incorrect email address"),
-	User_Password("Incorrect Password"),
-	Registration(" Registered Successfully"),
-	user_Already_exist("User already exists!"),
-	Chnage_Password("password change successfully!!"),
-	Update("Data updated Successfully"),
-	Delete("Data deleted Successfully"),
-	NotFound("Data not Found"),
-	Animal_transfer("animal Transfered successfully");
+	INCORRECT_EMAIL("Incorrect email address"),
+	INCORRECT_PASSWORD("Incorrect Password"),
+	REGISTRATION(" Registered Successfully"),
+   ALREADY_EXIST("User already exists!"),
+	CHANGE_PASSWORD("password change successfully!!"),
+	UPDATE("Data updated Successfully"),
+	DELETE("Data deleted Successfully"),
+	NOT_FOUND("Data not Found"),
+	ANIMAL_TRANSFER("animal Transfered successfully"),
+	USER_NOT_FOUND("user not found"),
+	TOKEN_NOT_RECEIVED("token not received!"),
+	UPDATE_PASSWORD_REQUEST("Update Password Request");
  
 	
 private String message;

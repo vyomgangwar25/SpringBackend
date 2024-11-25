@@ -9,6 +9,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.example.demo.entities.User;
 import com.example.demo.jwt.JwtUtil;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.RolePrivilageService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,10 +21,13 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 
 	@Autowired
-	JwtUtil jwtutil;
+	private JwtUtil jwtutil;
 
 	@Autowired
-	UserRepository repository;
+	private UserRepository repository;
+	
+	@Autowired
+	private RolePrivilageService rolePrivilageService;
 
 	@Override
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -46,10 +51,10 @@ public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 
 				boolean isValid = jwtutil.validateToken(token_frontend, userDetails);
 				if (isValid) {
+					User user = (User)rolePrivilageService.loadUserByUsername(userDetails.getUsername());
 					// Set the authentication in the context to mark the user as authenticated
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
-							null, userDetails.getAuthorities());
-
+							null, user.getAuthority());
 					SecurityContextHolder.getContext().setAuthentication(authToken);
 				} else {
 					System.out.println("Invalid or expired token");

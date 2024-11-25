@@ -1,10 +1,9 @@
 package com.example.demo.entities;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Entity;
@@ -21,6 +20,16 @@ public class User extends CommonEntity implements UserDetails {
 
 	private String role;
 
+	private Collection<? extends GrantedAuthority> authority;
+
+	public Collection<? extends GrantedAuthority> getAuthority() {
+		return authority;
+	}
+
+	public void setAuthority(Collection<? extends GrantedAuthority> authority) {
+		this.authority = authority;
+	}
+
 	public User() {
 	}
 
@@ -34,8 +43,9 @@ public class User extends CommonEntity implements UserDetails {
 	public void setpassword(String password) {
 		this.password = password;
 	}
+
 	public void setRole(String role) {
-		 this.role=role;
+		this.role = role;
 	}
 
 	public String getRole() {
@@ -61,11 +71,11 @@ public class User extends CommonEntity implements UserDetails {
 	public String getPassword() {
 		return password;
 	}
-	
-	
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+		// return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+		return authority;
 	}
+
 }

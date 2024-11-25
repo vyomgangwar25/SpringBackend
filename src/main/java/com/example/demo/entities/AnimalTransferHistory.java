@@ -1,5 +1,5 @@
-package com.example.demo.entities;
 
+package com.example.demo.entities;
 import java.util.Date;
 
 import jakarta.persistence.CascadeType;

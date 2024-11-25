@@ -5,11 +5,11 @@ import java.util.List;
 
 public enum EndPoint {
 
-	LOGIN("/login"),
-	REGISTRATION("/registration"),
-	FORGET_PASSWORD("/forgetpassword"),
-	newpath("/newpath"),
-	FETCH_ROLES("/fetchroles");
+	LOGIN("/user/login"),
+	REGISTRATION("/user/registration"),
+	FORGET_PASSWORD("/user/forgetpassword"),
+	newpath("/user/newpath"),
+	FETCH_ROLES("/user/fetchroles");
 
 	private String endPoint;
 

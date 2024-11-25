@@ -10,6 +10,6 @@ import com.example.demo.entities.Animal;
 
 public interface AnimalRepository extends JpaRepository<Animal, Integer> {
     long countByZooId(Integer zooId);
-    Page<Animal> findByZooId(Integer zooId, Pageable pageable);
-    List<Animal> getByZooId(Integer zooId);
+   public  Page<Animal> findByZooId(Integer zooId, Pageable pageable);
+   public  List<Animal> getByZooId(Integer zooId);
 }
