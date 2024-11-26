@@ -15,6 +15,8 @@ public class Zoo extends CommonEntity {
 
  
 	private Integer size;
+	
+	private String description;
 
 	public Zoo() {
 	}
@@ -23,10 +25,11 @@ public class Zoo extends CommonEntity {
 		setId(id);
 	}
 
-	public Zoo(String name, String location, Integer size) {
+	public Zoo(String name, String location, Integer size,String description) {
 		this.name = name;
 		this.location = location;
 		this.size = size;
+		this.description=description;
 	}
 
 	public String getName() {
@@ -51,6 +54,14 @@ public class Zoo extends CommonEntity {
 
 	public void setSize(Integer size) {
 		this.size = size;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

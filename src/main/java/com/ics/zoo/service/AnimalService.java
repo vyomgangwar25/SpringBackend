@@ -28,6 +28,8 @@ import com.ics.zoo.repository.AnimalRepository;
 import com.ics.zoo.repository.AnimalTransferHistoryRepository;
 import com.ics.zoo.repository.ZooRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class AnimalService extends AbstractService<AnimalRepository>
 {
@@ -70,10 +72,15 @@ public class AnimalService extends AbstractService<AnimalRepository>
 		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
 
+	@Transactional
 	public ResponseEntity<String> delete(Integer id) {
-		historyRepository.findById(id).get();
+	 
 		if (getRepository().existsById(id)) {
-			getRepository().deleteById(id);
+		List<AnimalTransferHistory> historydata=historyRepository.findByAnimalId(id);
+		if (historydata.size() > 0) {
+			historyRepository.deleteAllByAnimalId(id);	 
+		}
+		getRepository().deleteById(id);
 			return ResponseEntity.ok(ResponseEnum.DELETE.getMessage());
 		}
 		return ResponseEntity.status(404).body(ResponseEnum.NOT_FOUND.getMessage());

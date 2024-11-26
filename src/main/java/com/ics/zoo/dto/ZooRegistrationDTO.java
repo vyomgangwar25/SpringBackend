@@ -12,14 +12,18 @@ public class ZooRegistrationDTO {
     
      @NotNull(message="size cannot be zero")
 	public Integer size;
+     
+     @NotNull(message="description cannot be null")
+     public String description;
    
 	public ZooRegistrationDTO() {
 		
 	}
-	public ZooRegistrationDTO(String name, String location, Integer size ) {
+	public ZooRegistrationDTO(String name, String location, Integer size,String description ) {
 		this.name = name;
 		this.location = location;
-		this.size = size;	 
+		this.size = size;	
+		this.description=description;
 	}
 
 	public String getName() {
@@ -44,6 +48,12 @@ public class ZooRegistrationDTO {
 
 	public void setSize(Integer size) {
 		this.size = size;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 

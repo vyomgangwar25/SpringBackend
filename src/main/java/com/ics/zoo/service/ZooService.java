@@ -30,7 +30,7 @@ public class ZooService extends AbstractService<ZooRepository>   {
 		Long totalzoo = getRepository().count();
 		List<ZooDTO> zoodata = new ArrayList<>();
 		for (Zoo abc : pagezoo) {
-			zoodata.add(new ZooDTO(abc.getName(), abc.getLocation(), abc.getSize(), abc.getId()));
+			zoodata.add(new ZooDTO(abc.getName(), abc.getLocation(), abc.getSize(),abc.getDescription(), abc.getId()));
 		}
 		HashMap<String, Object> response = new HashMap<>();
 		response.put("zoodata", zoodata);
