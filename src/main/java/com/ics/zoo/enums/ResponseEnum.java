@@ -5,7 +5,7 @@ public enum ResponseEnum
 	INCORRECT_EMAIL("Incorrect email address"),
 	INCORRECT_PASSWORD("Incorrect Password"),
 	REGISTRATION(" Registered Successfully"),
-   ALREADY_EXIST("User already exists!"),
+	ALREADY_EXIST("User already exists!"),
 	CHANGE_PASSWORD("password change successfully!!"),
 	UPDATE("Data updated Successfully"),
 	DELETE("Data deleted Successfully"),

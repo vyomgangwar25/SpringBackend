@@ -10,19 +10,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
 import com.ics.zoo.entities.RolePrivileges;
 import com.ics.zoo.entities.Roles;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.repository.RolePrivilegesRepository;
 import com.ics.zoo.repository.RoleRepository;
-import com.ics.zoo.repository.UserRepository;
 
 @Service
 public class RolePrivilageService {
-
-	@Autowired
-	private UserRepository userRepository;
 
 	@Autowired
 	private RoleRepository roleRepository;
@@ -30,13 +25,12 @@ public class RolePrivilageService {
 	@Autowired
 	private RolePrivilegesRepository rolePrivilegesRepository;
 
-	public UserDetails loadUserByUsername(String username) {
+	public UserDetails loadUserByUsername(User user) {
 		List<Integer> privilegeList = new ArrayList<>();
-		User user = userRepository.findByUsername(username);
 		Roles role = roleRepository.findByRole(user.getRole());
 
-		List<RolePrivileges> ll = rolePrivilegesRepository.findByRoleId(role.getId());
-		for (RolePrivileges roleprivileges : ll) {
+		List<RolePrivileges> rolePriviledgeList = rolePrivilegesRepository.findByRoleId(role.getId());
+		for (RolePrivileges roleprivileges : rolePriviledgeList) {
 			privilegeList.add(roleprivileges.getPrivileges().getId());
 		}
 		user.setAuthority(setRolePrivilege(role.getRole(), privilegeList));

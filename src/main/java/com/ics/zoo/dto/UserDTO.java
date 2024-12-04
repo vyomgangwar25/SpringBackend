@@ -4,38 +4,23 @@ import com.ics.zoo.annotation.UniqueUserName;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO extends LoginUserDTO {
-	
+
 	@UniqueUserName
-	@NotNull(message = "name must not be empty")
-	@NotBlank(message = "name not be empty")
+	@NotNull(message = "name cannot be empty")
+	@NotBlank(message = "name cannot be black")
 	public String username;
 
 	@NotNull(message = "enter role")
 	public String role;
 
-	public UserDTO() {
-	}
-
-	public UserDTO(String username, String role) {
-		this.username = username;
-		this.role = role;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
 }

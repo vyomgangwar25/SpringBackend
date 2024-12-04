@@ -1,23 +1,17 @@
 package com.ics.zoo.entities;
 
 import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class Privileges extends CommonEntity  {
+public class Privileges extends CommonEntity {
 	String privileges;
-	public Privileges() {
-		 
-	}
-	public Privileges(String privileges) {
-		this.privileges=privileges;
-	}
-	public String getPrivileges() {
-		return privileges;
-	}
-	public void setPrivileges(String privileges) {
-		this.privileges = privileges;
-	}
-	
-	
 
 }

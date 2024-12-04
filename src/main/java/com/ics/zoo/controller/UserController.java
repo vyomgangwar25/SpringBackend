@@ -55,7 +55,6 @@ public class UserController extends AbstractController<UserService> {
 	@PostMapping("/setnewpassword")
 	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,
 			@Valid @RequestBody String newpassword) {
-
 		return getService().newPassowrd(tokenHeader, newpassword);
 	}
 

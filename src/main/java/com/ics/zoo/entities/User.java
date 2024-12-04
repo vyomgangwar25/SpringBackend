@@ -7,6 +7,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 
 @Entity
 public class User extends CommonEntity implements UserDetails {
@@ -28,48 +37,6 @@ public class User extends CommonEntity implements UserDetails {
 
 	public void setAuthority(Collection<? extends GrantedAuthority> authority) {
 		this.authority = authority;
-	}
-
-	public User() {
-	}
-
-	public User(String username, String email, String password, String role) {
-		this.username = username;
-		this.email = email;
-		this.password = password;
-		this.role = role;
-	}
-
-	public void setpassword(String password) {
-		this.password = password;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
-
-	public String getRole() {
-		return role;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getPassword() {
-		return password;
 	}
 
 	@Override

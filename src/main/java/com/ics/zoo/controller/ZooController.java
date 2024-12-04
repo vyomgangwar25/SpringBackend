@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ics.zoo.dto.ZooRegistrationDTO;
-import com.ics.zoo.entities.Zoo;
 import com.ics.zoo.service.ZooService;
 
 import jakarta.validation.Valid;
@@ -23,7 +22,7 @@ import jakarta.validation.Valid;
 public class ZooController extends AbstractController<ZooService> {	
 	
 	@PostMapping("/create")
-	public ResponseEntity<Zoo> create(@Valid @RequestBody ZooRegistrationDTO zooInput) {
+	public ResponseEntity<String> create(@Valid @RequestBody ZooRegistrationDTO zooInput) {
 		return  getService().register(zooInput);
 	}
 
@@ -37,7 +36,6 @@ public class ZooController extends AbstractController<ZooService> {
 		return getService().update(id, updatezoo);
 	}
 	
-	//@PreAuthorize("hasRole('admin')")
 	@PreAuthorize("hasAuthority('AUTHORITY_3')")
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<String> delete(@PathVariable Integer id) {

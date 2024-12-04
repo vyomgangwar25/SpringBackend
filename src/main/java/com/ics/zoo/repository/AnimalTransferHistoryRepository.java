@@ -9,9 +9,7 @@ import com.ics.zoo.entities.AnimalTransferHistory;
 @Repository
 public interface AnimalTransferHistoryRepository extends JpaRepository<AnimalTransferHistory, Integer>
 {
-	public List<AnimalTransferHistory> findByAnimalId(Integer id);
-
-	public void deleteAllByAnimalId(Integer id);	 
+	public List<AnimalTransferHistory> findByAnimalId(Integer id); 
 }
  
 

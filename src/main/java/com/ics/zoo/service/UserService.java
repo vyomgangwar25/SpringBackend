@@ -3,10 +3,11 @@ package com.ics.zoo.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -37,14 +38,12 @@ public class UserService extends AbstractService<UserRepository> {
 	private JwtUtil jwtutil;
 
 	public ResponseEntity<?> login(LoginUserDTO userInput) {
-		List<LoginResponseDTO> response = new ArrayList<>();
 		User existingUser = getRepository().findByEmail(userInput.getEmail());
 		if (existingUser != null) {
 			if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
 				String generated_token = jwtutil.generateToken(existingUser);
-				response.add(new LoginResponseDTO(generated_token, existingUser.getRole(), existingUser.getEmail(),
-						existingUser.getUsername(), existingUser.getId()));
-				return ResponseEntity.ok(response);
+				return ResponseEntity.ok(new LoginResponseDTO(generated_token, existingUser.getRole(),
+						existingUser.getEmail(), existingUser.getUsername(), existingUser.getId()));
 			}
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_PASSWORD.getMessage());
 		}
@@ -54,7 +53,7 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<String> register(UserDTO userInput) {
 		if (getRepository().findByEmail(userInput.email) == null) {
 			User user = modelMapper.map(userInput, User.class);
-			user.setpassword(passwordEncoder.encode(userInput.getPassword()));
+			user.setPassword(passwordEncoder.encode(userInput.getPassword()));
 			getRepository().save(user);
 			return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
 		}
@@ -67,10 +66,14 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	public ResponseEntity<String> update(Integer id, UserDTO userDetails) {
-		User user = getRepository().findById(id).get();
-		user.setUsername(userDetails.getUsername());
-		user.setEmail(userDetails.getEmail());
-		getRepository().save(user);
+		try {
+			User user = getRepository().findById(id).get();
+			user.setUsername(userDetails.getUsername());
+			user.setEmail(userDetails.getEmail());
+			getRepository().save(user);
+		} catch (DataIntegrityViolationException e) {
+			throw e;
+		}
 		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
 
@@ -101,11 +104,9 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	public ResponseEntity<String> newPassowrd(String tokenHeader, String newpassword) {
-		String extractToken = tokenHeader.substring(7); /* extract token from headers */
-		String userEmail = jwtutil.extractUsername(extractToken);
-		User user = getRepository().findByEmail(userEmail);
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String encodedPassword = passwordEncoder.encode(newpassword);
-		user.setpassword(encodedPassword);
+		user.setPassword(encodedPassword);
 		getRepository().save(user);
 		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}

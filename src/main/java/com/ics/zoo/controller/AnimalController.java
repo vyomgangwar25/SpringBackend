@@ -1,5 +1,6 @@
 package com.ics.zoo.controller;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ics.zoo.dto.AnimalDTO;
 import com.ics.zoo.dto.AnimalUpdateDTO;
+import com.ics.zoo.entities.Zoo;
 import com.ics.zoo.service.AnimalService;
 
 @RestController
@@ -44,8 +46,8 @@ public class AnimalController extends AbstractController<AnimalService>
 	}
 
 	@GetMapping("/zoolist")
-	public ResponseEntity<HashMap<String, Object>> dropDownList(@RequestParam Integer zooId) {
-		return getService().zoolist(zooId);
+	public ResponseEntity<List<Zoo>> dropDownList(@RequestParam Integer zooId) {
+		return getService().transferableZooList(zooId);
 	}
 
 	@PutMapping("/transfer")

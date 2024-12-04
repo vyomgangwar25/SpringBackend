@@ -16,34 +16,31 @@ import com.ics.zoo.enums.ResponseEnum;
 import com.ics.zoo.repository.ZooRepository;
 
 @Service
-public class ZooService extends AbstractService<ZooRepository>   {
+public class ZooService extends AbstractService<ZooRepository> {
 
-	public ResponseEntity<Zoo> register(ZooRegistrationDTO zooInput) {
+	public ResponseEntity<String> register(ZooRegistrationDTO zooInput) {
 		Zoo newZoo = modelMapper.map(zooInput, Zoo.class);
 		getRepository().save(newZoo);
-		return ResponseEntity.ok(newZoo);
+		return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
 	}
 
 	public ResponseEntity<HashMap<String, Object>> extract(Integer page, Integer pagesize) {
-		PageRequest pageable = PageRequest.of(page, pagesize);
-		Page<Zoo> pagezoo = getRepository().findAll(pageable);
-		Long totalzoo = getRepository().count();
+		Page<Zoo> pagezoo = getRepository().findAll(PageRequest.of(page, pagesize));
 		List<ZooDTO> zoodata = new ArrayList<>();
-		for (Zoo abc : pagezoo) {
-			zoodata.add(new ZooDTO(abc.getName(), abc.getLocation(), abc.getSize(),abc.getDescription(), abc.getId()));
+		for (Zoo zoo : pagezoo) {
+			ZooDTO mappedzoo = modelMapper.map(zoo, ZooDTO.class);
+			zoodata.add(mappedzoo);
 		}
 		HashMap<String, Object> response = new HashMap<>();
 		response.put("zoodata", zoodata);
-		response.put("totalzoo", totalzoo);
+		response.put("totalzoo", getRepository().count());
 		return ResponseEntity.ok(response);
 	}
 
 	public ResponseEntity<String> update(Integer id, ZooRegistrationDTO updatezoo) {
-		Zoo zoodata = getRepository().findById(id).get();
-		zoodata.setName(updatezoo.getName());
-		zoodata.setLocation(updatezoo.getLocation());
-		zoodata.setSize(updatezoo.getSize());
-		getRepository().save(zoodata);
+		if (getRepository().existsById(id)) {
+			getRepository().save(modelMapper.map(updatezoo, Zoo.class));
+		}
 		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
 

@@ -11,10 +11,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 23-Sept-2024
  */
 @SpringBootApplication
-public class DemoApplication
+public class ZooApplication
 {
 	public static void main(String... args)
 	{
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(ZooApplication.class, args);
 	}
 }

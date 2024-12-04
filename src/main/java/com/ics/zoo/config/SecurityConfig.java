@@ -14,7 +14,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.ics.zoo.DemoApplication;
+import com.ics.zoo.ZooApplication;
 import com.ics.zoo.enums.EndPoint;
 import com.ics.zoo.filter.ZooFilter;
 
@@ -56,7 +56,7 @@ public class SecurityConfig {
 	}
 
 	/**
-	 * SecurityFilterChain Config {@link DemoApplication}
+	 * SecurityFilterChain Config {@link ZooApplication}
 	 * 
 	 * @param http
 	 * @return SecurityFilterChain

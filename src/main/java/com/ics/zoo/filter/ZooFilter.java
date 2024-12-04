@@ -51,7 +51,7 @@ public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 
 				boolean isValid = jwtutil.validateToken(token_frontend, userDetails);
 				if (isValid) {
-					User user = (User) rolePrivilageService.loadUserByUsername(userDetails.getUsername());
+					User user = (User) rolePrivilageService.loadUserByUsername(userDetails);
 					// Set the authentication in the context to mark the user as authenticated
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
 							null, user.getAuthority());
