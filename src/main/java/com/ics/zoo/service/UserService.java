@@ -42,8 +42,9 @@ public class UserService extends AbstractService<UserRepository> {
 		if (existingUser != null) {
 			if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
 				String generated_token = jwtutil.generateToken(existingUser);
-				return ResponseEntity.ok(new LoginResponseDTO(generated_token, existingUser.getRole(),
-						existingUser.getEmail(), existingUser.getUsername(), existingUser.getId()));
+				LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
+				response.setToken(generated_token);
+				return ResponseEntity.ok(response);
 			}
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_PASSWORD.getMessage());
 		}
@@ -79,13 +80,12 @@ public class UserService extends AbstractService<UserRepository> {
 
 	public ResponseEntity<?> userInfo(String tokenHeader) {
 		if (tokenHeader != null) {
-			String extractToken = tokenHeader.substring(7);
-			String userEmail = jwtutil.extractUsername(extractToken);
-			User details = getRepository().findByEmail(userEmail);
-			List<LoginResponseDTO> response = new ArrayList<>();
-			response.add(
-					new LoginResponseDTO(null, details.getRole(), userEmail, details.getUsername(), details.getId()));
-			return ResponseEntity.ok(response);
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+			LoginResponseDTO userdata = modelMapper.map(user, LoginResponseDTO.class);
+			userdata.setToken(null);
+			
+			return ResponseEntity.ok(userdata);
 		}
 		throw new ResponseStatusException(HttpStatus.CONFLICT, ResponseEnum.TOKEN_NOT_RECEIVED.getMessage());
 	}

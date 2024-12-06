@@ -41,10 +41,8 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 	}
 
 	public ResponseEntity<HashMap<String, Object>> extract(Integer id, Integer page, Integer pagesize) {
-
 		Page<Animal> pageAnimal = getRepository().findByZooId(id, PageRequest.of(page, pagesize));
 		ArrayList<ExtractAnimalDTO> animaldata = new ArrayList<>();
-
 		for (Animal animal : pageAnimal) {
 			ExtractAnimalDTO mappedanimalobj = modelMapper.map(animal, ExtractAnimalDTO.class);
 			mappedanimalobj.setZoo_id(id);
@@ -54,7 +52,6 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 		HashMap<String, Object> response = new HashMap<>();
 		response.put("animaldata", animaldata);
 		response.put("animalcount", getRepository().countByZooId(id));
-
 		return ResponseEntity.ok(response);
 	}
 

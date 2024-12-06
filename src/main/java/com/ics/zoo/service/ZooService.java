@@ -39,7 +39,9 @@ public class ZooService extends AbstractService<ZooRepository> {
 
 	public ResponseEntity<String> update(Integer id, ZooRegistrationDTO updatezoo) {
 		if (getRepository().existsById(id)) {
-			getRepository().save(modelMapper.map(updatezoo, Zoo.class));
+			Zoo zooodata = modelMapper.map(updatezoo, Zoo.class);
+			zooodata.setId(id);
+			getRepository().save(zooodata);
 		}
 		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
