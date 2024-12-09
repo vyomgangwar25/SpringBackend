@@ -1,7 +1,6 @@
 package com.ics.zoo.dto;
 
 import com.ics.zoo.annotation.UniqueUserName;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,5 +21,9 @@ public class UserDTO extends LoginUserDTO {
 
 	@NotNull(message = "enter role")
 	public String role;
+	//private Collection<? extends GrantedAuthority> authority;
+
+	
+	
 
 }

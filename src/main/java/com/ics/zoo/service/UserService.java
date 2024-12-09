@@ -1,6 +1,5 @@
 package com.ics.zoo.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.ics.zoo.dto.LoginResponseDTO;
 import com.ics.zoo.dto.LoginUserDTO;
 import com.ics.zoo.dto.UserDTO;
@@ -55,6 +53,7 @@ public class UserService extends AbstractService<UserRepository> {
 		if (getRepository().findByEmail(userInput.email) == null) {
 			User user = modelMapper.map(userInput, User.class);
 			user.setPassword(passwordEncoder.encode(userInput.getPassword()));
+			user.setAuthority(null);
 			getRepository().save(user);
 			return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
 		}
@@ -81,10 +80,8 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<?> userInfo(String tokenHeader) {
 		if (tokenHeader != null) {
 			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			
 			LoginResponseDTO userdata = modelMapper.map(user, LoginResponseDTO.class);
 			userdata.setToken(null);
-			
 			return ResponseEntity.ok(userdata);
 		}
 		throw new ResponseStatusException(HttpStatus.CONFLICT, ResponseEnum.TOKEN_NOT_RECEIVED.getMessage());
