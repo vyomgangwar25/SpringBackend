@@ -1,4 +1,5 @@
 package com.ics.zoo.annotation;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ics.zoo.repository.UserRepository;
@@ -6,12 +7,12 @@ import com.ics.zoo.repository.UserRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class UniqueUserNameValidator implements ConstraintValidator<UniqueUserName, String>  {
+public class UniqueUserNameValidator implements ConstraintValidator<UniqueUserName, String> {
 	@Autowired
-	UserRepository repository;
-	
+	private UserRepository repository;
+
 	@Override
 	public boolean isValid(String username, ConstraintValidatorContext context) {
-		return !repository.existsByUsername(username);  
+		return !repository.existsByUsername(username);
 	}
 }

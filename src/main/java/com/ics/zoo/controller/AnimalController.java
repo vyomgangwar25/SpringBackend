@@ -18,6 +18,13 @@ import com.ics.zoo.dto.AnimalUpdateDTO;
 import com.ics.zoo.entities.Zoo;
 import com.ics.zoo.service.AnimalService;
 
+/**
+ * animal controller
+ * 
+ * @author Vyom Gangwar
+ * @since 25-Oct-2024
+ * 
+ * */
 @RestController
 @RequestMapping("/animal")
 public class AnimalController extends AbstractController<AnimalService>

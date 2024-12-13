@@ -38,6 +38,7 @@ public class ZooService extends AbstractService<ZooRepository> {
 	}
 
 	public ResponseEntity<String> update(Integer id, ZooRegistrationDTO updatezoo) {
+
 		if (getRepository().existsById(id)) {
 			Zoo zooodata = modelMapper.map(updatezoo, Zoo.class);
 			zooodata.setId(id);
@@ -47,9 +48,13 @@ public class ZooService extends AbstractService<ZooRepository> {
 	}
 
 	public ResponseEntity<String> delete(Integer id) {
-		if (getRepository().existsById(id)) {
-			getRepository().deleteById(id);
-			return ResponseEntity.ok(ResponseEnum.DELETE.getMessage());
+		try {
+			if (getRepository().existsById(id)) {
+				getRepository().deleteById(id);
+				return ResponseEntity.ok(ResponseEnum.DELETE.getMessage());
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(404).body(ResponseEnum.CONSTRAINT_FAILS.getMessage());
 		}
 		return ResponseEntity.status(404).body(ResponseEnum.NOT_FOUND.getMessage());
 	}

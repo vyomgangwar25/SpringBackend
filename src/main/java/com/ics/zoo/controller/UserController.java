@@ -13,11 +13,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ics.zoo.dto.LoginUserDTO;
+import com.ics.zoo.dto.PasswordDTO;
 import com.ics.zoo.dto.UserDTO;
+import com.ics.zoo.dto.UserInfoDTO;
 import com.ics.zoo.entities.Roles;
 import com.ics.zoo.service.UserService;
 
 import jakarta.validation.Valid;
+
+/**
+ * user controller
+ * 
+ * @author Vyom Gangwar
+ * @since 5-Oct-2024
+ */
 
 @RestController
 @RequestMapping("/user")
@@ -38,7 +47,7 @@ public class UserController extends AbstractController<UserService> {
 	}
 
 	@PutMapping("/update/{id}")
-	public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody UserDTO userDetails) {
+	public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody UserInfoDTO userDetails) {
 		return getService().update(id, userDetails);
 	}
 
@@ -54,9 +63,8 @@ public class UserController extends AbstractController<UserService> {
 
 	@PostMapping("/setnewpassword")
 	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,
-			@Valid @RequestBody String newpassword) {
-		return getService().newPassowrd(tokenHeader, newpassword);
+		 @Valid @RequestBody PasswordDTO password ) {
+		return getService().newPassowrd(tokenHeader,password);
 	}
 
- 
 }

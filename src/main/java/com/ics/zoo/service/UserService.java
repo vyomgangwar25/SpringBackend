@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import com.ics.zoo.dto.LoginResponseDTO;
 import com.ics.zoo.dto.LoginUserDTO;
+import com.ics.zoo.dto.PasswordDTO;
 import com.ics.zoo.dto.UserDTO;
+import com.ics.zoo.dto.UserInfoDTO;
 import com.ics.zoo.entities.Roles;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.enums.ResponseEnum;
@@ -20,6 +22,8 @@ import com.ics.zoo.repository.RoleRepository;
 import com.ics.zoo.repository.UserRepository;
 import com.ics.zoo.util.JwtUtil;
 import com.ics.zoo.util.UrlConstant;
+
+import ch.qos.logback.core.util.StringUtil;
 
 @Service
 public class UserService extends AbstractService<UserRepository> {
@@ -53,7 +57,6 @@ public class UserService extends AbstractService<UserRepository> {
 		if (getRepository().findByEmail(userInput.email) == null) {
 			User user = modelMapper.map(userInput, User.class);
 			user.setPassword(passwordEncoder.encode(userInput.getPassword()));
-			user.setAuthority(null);
 			getRepository().save(user);
 			return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
 		}
@@ -65,10 +68,10 @@ public class UserService extends AbstractService<UserRepository> {
 		return ResponseEntity.ok(allroles);
 	}
 
-	public ResponseEntity<String> update(Integer id, UserDTO userDetails) {
+	public ResponseEntity<String> update(Integer id, UserInfoDTO userDetails) {
 		try {
 			User user = getRepository().findById(id).get();
-			user.setUsername(userDetails.getUsername());
+			user.setUsername(userDetails.getName());
 			user.setEmail(userDetails.getEmail());
 			getRepository().save(user);
 		} catch (DataIntegrityViolationException e) {
@@ -100,10 +103,23 @@ public class UserService extends AbstractService<UserRepository> {
 		}
 	}
 
-	public ResponseEntity<String> newPassowrd(String tokenHeader, String newpassword) {
+	public ResponseEntity<String> newPassowrd(String tokenHeader, PasswordDTO password) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String encodedPassword = passwordEncoder.encode(newpassword);
+//		if (password.getOldpassword().trim().length()!= 0) {
+//		if (!passwordEncoder.matches(password.getOldpassword(), user.getPassword())) {
+//			return ResponseEntity.status(401).body(ResponseEnum.INCORRECT_OLD_PASSWORD.getMessage());
+//		}
+//	}
+		if(!StringUtil.isNullOrEmpty(password.getOldpassword()))
+				{
+			if (!passwordEncoder.matches(password.getOldpassword(), user.getPassword())) {
+				return ResponseEntity.status(401).body(ResponseEnum.INCORRECT_OLD_PASSWORD.getMessage());
+			}
+				}
+
+		String encodedPassword = passwordEncoder.encode(password.getNewpassword());
 		user.setPassword(encodedPassword);
+		user.setAuthority(null);
 		getRepository().save(user);
 		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}

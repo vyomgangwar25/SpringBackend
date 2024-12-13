@@ -13,8 +13,9 @@ public enum ResponseEnum
 	ANIMAL_TRANSFER("animal Transfered successfully"),
 	USER_NOT_FOUND("user not found"),
 	TOKEN_NOT_RECEIVED("token not received!"),
-	UPDATE_PASSWORD_REQUEST("Update Password Request");
- 
+	UPDATE_PASSWORD_REQUEST("Update Password Request"),
+	CONSTRAINT_FAILS("Cannot delete,a foreign key constraint fails"),
+	INCORRECT_OLD_PASSWORD("Incorrect Old Password!!");
 	
 private String message;
 
