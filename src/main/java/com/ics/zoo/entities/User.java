@@ -2,11 +2,13 @@ package com.ics.zoo.entities;
 
 import java.util.Collection;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,9 +19,10 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@EntityListeners(AuditingEntityListener.class)
 @Entity
-public class User extends CommonEntity implements UserDetails {
+
+public class User extends Audit implements UserDetails {
 	private static final long serialVersionUID = 1L;
 
 	private String username;

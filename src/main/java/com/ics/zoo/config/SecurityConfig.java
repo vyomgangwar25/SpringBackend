@@ -4,6 +4,8 @@ import java.util.Arrays;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,13 +17,15 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.ics.zoo.ZooApplication;
+import com.ics.zoo.audit.AuditorAwareImpl;
 import com.ics.zoo.enums.EndPoint;
 import com.ics.zoo.filter.ZooFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize
-public class SecurityConfig {
+@EnableJpaAuditing(modifyOnCreate = false)
+public class SecurityConfig  {
 	/**
 	 * password encoder bean
 	 * 
@@ -42,7 +46,14 @@ public class SecurityConfig {
 	ModelMapper modelMapper() {
 		return new ModelMapper();
 	}
-
+	
+	  @Bean
+	    public AuditorAware<String> auditorProvider() {
+	 
+	        return new AuditorAwareImpl();
+	    }
+	
+	 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
@@ -74,5 +85,7 @@ public class SecurityConfig {
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
 				.httpBasic(httpBasic -> httpBasic.disable());
 		return security.build();
-	} 
+	}
+
+
 }

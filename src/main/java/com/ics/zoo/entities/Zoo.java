@@ -1,6 +1,9 @@
 package com.ics.zoo.entities;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,9 +15,10 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Entity
-@Builder
-public class Zoo extends CommonEntity {
+
+public class Zoo extends Audit {
 
 	@NotBlank(message = "Name is required")
 	private String name;

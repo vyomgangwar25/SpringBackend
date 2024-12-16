@@ -110,16 +110,15 @@ public class UserService extends AbstractService<UserRepository> {
 //			return ResponseEntity.status(401).body(ResponseEnum.INCORRECT_OLD_PASSWORD.getMessage());
 //		}
 //	}
-		if(!StringUtil.isNullOrEmpty(password.getOldpassword()))
-				{
+		if (!StringUtil.isNullOrEmpty(password.getOldpassword())) {
 			if (!passwordEncoder.matches(password.getOldpassword(), user.getPassword())) {
 				return ResponseEntity.status(401).body(ResponseEnum.INCORRECT_OLD_PASSWORD.getMessage());
 			}
-				}
+		}
 
 		String encodedPassword = passwordEncoder.encode(password.getNewpassword());
 		user.setPassword(encodedPassword);
-		user.setAuthority(null);
+     	user.setAuthority(null);
 		getRepository().save(user);
 		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}
