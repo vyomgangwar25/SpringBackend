@@ -45,6 +45,7 @@ public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 			}
 
 			String username = jwtutil.extractUsername(token_frontend);
+			System.out.println(username);
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				User userDetails = repository.findByEmail(username);

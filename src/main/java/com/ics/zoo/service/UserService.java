@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,9 +17,11 @@ import com.ics.zoo.dto.PasswordDTO;
 import com.ics.zoo.dto.UserDTO;
 import com.ics.zoo.dto.UserInfoDTO;
 import com.ics.zoo.entities.Roles;
+import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.enums.ResponseEnum;
 import com.ics.zoo.repository.RoleRepository;
+import com.ics.zoo.repository.TokenRepository;
 import com.ics.zoo.repository.UserRepository;
 import com.ics.zoo.util.JwtUtil;
 import com.ics.zoo.util.UrlConstant;
@@ -39,6 +42,9 @@ public class UserService extends AbstractService<UserRepository> {
 	@Autowired
 	private JwtUtil jwtutil;
 
+	@Autowired
+	private TokenRepository tokenRepository;
+
 	public ResponseEntity<?> login(LoginUserDTO userInput) {
 		User existingUser = getRepository().findByEmail(userInput.getEmail());
 		if (existingUser != null) {
@@ -46,11 +52,30 @@ public class UserService extends AbstractService<UserRepository> {
 				String generated_token = jwtutil.generateToken(existingUser);
 				LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
 				response.setToken(generated_token);
+				TokenCheck check = new TokenCheck(generated_token, 1, existingUser.getId());
+				tokenRepository.save(check);
 				return ResponseEntity.ok(response);
 			}
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_PASSWORD.getMessage());
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_EMAIL.getMessage());
+	}
+
+	public ResponseEntity<String> logout(String tokenHeader) {
+		if (tokenHeader != null) {
+			User olduser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<TokenCheck> list = tokenRepository.findByUserId(olduser.getId());
+			TokenCheck tokencheck = list.get(list.size() - 1);
+			tokencheck.setIsvalid(0);
+//			for (int i = 0; i < list.size(); i++) {
+//				TokenCheck tokencheck2 = list.get(i);
+//				tokencheck2.setIsvalid(0);
+//				tokenRepository.save(tokencheck2);
+//			}
+			tokenRepository.save(tokencheck);
+			return ResponseEntity.ok(ResponseEnum.TOKEN_BIT_CHANGE.getMessage());
+		}
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseEnum.NOT_FOUND.getMessage());
 	}
 
 	public ResponseEntity<String> register(UserDTO userInput) {
@@ -118,7 +143,7 @@ public class UserService extends AbstractService<UserRepository> {
 
 		String encodedPassword = passwordEncoder.encode(password.getNewpassword());
 		user.setPassword(encodedPassword);
-     	user.setAuthority(null);
+		user.setAuthority(null);
 		getRepository().save(user);
 		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}

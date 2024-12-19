@@ -40,6 +40,10 @@ public class UserController extends AbstractController<UserService> {
 	public ResponseEntity<String> registration(@Valid @RequestBody UserDTO userInput) {
 		return getService().register(userInput);
 	}
+	@PostMapping("/logout")
+	public ResponseEntity<String>logout(@RequestHeader("Authorization") String tokenHeader){
+		return getService().logout(tokenHeader);
+	}
 
 	@GetMapping("/fetchroles")
 	public ResponseEntity<List<Roles>> roles() {

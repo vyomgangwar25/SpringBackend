@@ -17,9 +17,11 @@ import org.springframework.stereotype.Component;
 
 import com.ics.zoo.entities.RolePrivileges;
 import com.ics.zoo.entities.Roles;
+import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.repository.RolePrivilegesRepository;
 import com.ics.zoo.repository.RoleRepository;
+import com.ics.zoo.repository.TokenRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -33,6 +35,9 @@ public class JwtUtil {
 
 	@Autowired
 	private RoleRepository roleRepository;
+
+	@Autowired
+	private TokenRepository tokenRepository;
 
 	private String SECRET_KEY = "2D4A614E645267556B58703273357638792F423F4428472B4B6250655368566D";
 
@@ -70,6 +75,12 @@ public class JwtUtil {
 	}
 
 	public Boolean validateToken(String token, User userDetails) {
+		List<TokenCheck> abc = tokenRepository.findByUserId(userDetails.getId());
+		//int index = abc.size() - 1;
+		TokenCheck tokencheck = abc.get(abc.size()-1);
+		if (tokencheck.getIsvalid() == 0) {
+			return false;
+		}
 		final String username = extractUsername(token);
 		return (username.equals(userDetails.getEmail()) && !isTokenExpired(token));
 	}
