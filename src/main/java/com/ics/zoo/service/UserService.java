@@ -3,14 +3,15 @@ package com.ics.zoo.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import com.ics.zoo.dto.LoginResponseDTO;
 import com.ics.zoo.dto.LoginUserDTO;
 import com.ics.zoo.dto.PasswordDTO;
@@ -52,8 +53,8 @@ public class UserService extends AbstractService<UserRepository> {
 				String generated_token = jwtutil.generateToken(existingUser);
 				LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
 				response.setToken(generated_token);
-				TokenCheck check = new TokenCheck(generated_token, 1, existingUser.getId());
-				tokenRepository.save(check);
+				TokenCheck tokenCheck = new TokenCheck(generated_token, 1, existingUser);
+				tokenRepository.save(tokenCheck);
 				return ResponseEntity.ok(response);
 			}
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_PASSWORD.getMessage());
@@ -63,16 +64,19 @@ public class UserService extends AbstractService<UserRepository> {
 
 	public ResponseEntity<String> logout(String tokenHeader) {
 		if (tokenHeader != null) {
-			User olduser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			List<TokenCheck> list = tokenRepository.findByUserId(olduser.getId());
-			TokenCheck tokencheck = list.get(list.size() - 1);
-			tokencheck.setIsvalid(0);
+			String token = tokenHeader.substring(7);
+			// User olduser = (User)
+			// SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			TokenCheck tcObject = tokenRepository.findByToken(token);
+			tcObject.setIsvalid(0);
+//			TokenCheck tokencheck = list.get(list.size() - 1);
+//			tokencheck.setIsvalid(0);
 //			for (int i = 0; i < list.size(); i++) {
 //				TokenCheck tokencheck2 = list.get(i);
 //				tokencheck2.setIsvalid(0);
 //				tokenRepository.save(tokencheck2);
 //			}
-			tokenRepository.save(tokencheck);
+			tokenRepository.save(tcObject);
 			return ResponseEntity.ok(ResponseEnum.TOKEN_BIT_CHANGE.getMessage());
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseEnum.NOT_FOUND.getMessage());
@@ -88,6 +92,7 @@ public class UserService extends AbstractService<UserRepository> {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseEnum.ALREADY_EXIST.getMessage());
 	}
 
+	@Cacheable(value = "roles")
 	public ResponseEntity<List<Roles>> roles() {
 		List<Roles> allroles = roleRepository.findAll();
 		return ResponseEntity.ok(allroles);

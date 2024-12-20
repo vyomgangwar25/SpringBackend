@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
+import com.ics.zoo.repository.TokenRepository;
 import com.ics.zoo.repository.UserRepository;
 import com.ics.zoo.service.RolePrivilageService;
 import com.ics.zoo.util.JwtUtil;
@@ -23,9 +25,6 @@ public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 
 	@Autowired
 	private JwtUtil jwtutil;
-
-	@Autowired
-	private UserRepository repository;
 
 	@Autowired
 	private RolePrivilageService rolePrivilageService;
@@ -45,13 +44,9 @@ public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 			}
 
 			String username = jwtutil.extractUsername(token_frontend);
-			System.out.println(username);
-
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-				User userDetails = repository.findByEmail(username);
-
-				boolean isValid = jwtutil.validateToken(token_frontend, userDetails);
-				if (isValid) {
+				User userDetails = jwtutil.validateToken(token_frontend);
+				if (userDetails != null) {
 					User user = (User) rolePrivilageService.loadUserByUsername(userDetails);
 					// Set the authentication in the context to mark the user as authenticated
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,

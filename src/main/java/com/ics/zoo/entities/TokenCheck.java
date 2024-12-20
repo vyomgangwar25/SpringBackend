@@ -1,7 +1,10 @@
 package com.ics.zoo.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +16,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class TokenCheck extends CommonEntity {
+
 	private String token;
 	private Integer isvalid;
-	@Column(name="user_id")
-	private Integer userId;
+	 
+	@ManyToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name = "user_id", referencedColumnName = "id")
+	private User user;
 }

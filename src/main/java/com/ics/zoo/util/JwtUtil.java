@@ -74,15 +74,17 @@ public class JwtUtil {
 		return createToken(claims, userDetails.getEmail());
 	}
 
-	public Boolean validateToken(String token, User userDetails) {
-		List<TokenCheck> abc = tokenRepository.findByUserId(userDetails.getId());
-		//int index = abc.size() - 1;
-		TokenCheck tokencheck = abc.get(abc.size()-1);
-		if (tokencheck.getIsvalid() == 0) {
-			return false;
+	public User validateToken(String token) {
+		TokenCheck abc = tokenRepository.findByToken(token);
+		if (abc.getIsvalid() == 0) {
+			return null;
 		}
 		final String username = extractUsername(token);
-		return (username.equals(userDetails.getEmail()) && !isTokenExpired(token));
+
+		if (username.equals(abc.getUser().getEmail()) && !isTokenExpired(token)) {
+			return abc.getUser();
+		}
+		return null;
 	}
 
 	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
