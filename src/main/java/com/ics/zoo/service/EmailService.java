@@ -2,6 +2,7 @@ package com.ics.zoo.service;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -15,7 +16,7 @@ public class EmailService {
 	
 	HashMap<String, Integer> otpvalidation = new HashMap<>();
 
-	public void sendMail(String mailTo, String subject, String url) {
+	public void sendMail(String mailTo, String subject, Set<String> url) {
 
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(mailTo);

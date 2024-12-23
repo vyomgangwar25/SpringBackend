@@ -40,8 +40,9 @@ public class UserController extends AbstractController<UserService> {
 	public ResponseEntity<String> registration(@Valid @RequestBody UserDTO userInput) {
 		return getService().register(userInput);
 	}
+
 	@PostMapping("/logout")
-	public ResponseEntity<String>logout(@RequestHeader("Authorization") String tokenHeader){
+	public ResponseEntity<String> logout(@RequestHeader("Authorization") String tokenHeader) {
 		return getService().logout(tokenHeader);
 	}
 
@@ -61,14 +62,19 @@ public class UserController extends AbstractController<UserService> {
 	}
 
 	@PostMapping("/forgetpassword")
-	public ResponseEntity<String> forgetPassword(@RequestBody String email) {
+	public ResponseEntity<?> forgetPassword(@RequestBody String email) {
 		return getService().forgetPassword(email);
 	}
 
-	@PostMapping("/setnewpassword")
-	public ResponseEntity<String> setNewPassword(@RequestHeader("Authorization") String tokenHeader,
-		 @Valid @RequestBody PasswordDTO password ) {
-		return getService().newPassowrd(tokenHeader,password);
+	@PostMapping("/updatepassword") 
+	public ResponseEntity<String>  updatepassword(@RequestHeader("Authorization") String tokenHeader,
+			@Valid @RequestBody PasswordDTO password) {
+		return getService().updatepassword(tokenHeader, password);
 	}
 
+	@PostMapping("/setnewpassword")
+	public ResponseEntity<String> setpassword(@RequestHeader("Authorization2") String tokenHeader,
+			  @RequestBody PasswordDTO password) {
+		return getService().setpassword(tokenHeader, password);
+	}
 }

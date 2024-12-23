@@ -5,6 +5,7 @@ import java.util.List;
 
 public enum EndPoint {
 
+	TEST("/user/setnewpassword"),
 	LOGIN("/user/login"),
 	REGISTRATION("/user/registration"),
 	FORGET_PASSWORD("/user/forgetpassword"),

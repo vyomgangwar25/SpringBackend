@@ -74,15 +74,17 @@ public class JwtUtil {
 		return createToken(claims, userDetails.getEmail());
 	}
 
-	public User validateToken(String token) {
-		TokenCheck abc = tokenRepository.findByToken(token);
-		if (abc.getIsvalid() == 0) {
-			return null;
-		}
-		final String username = extractUsername(token);
-
-		if (username.equals(abc.getUser().getEmail()) && !isTokenExpired(token)) {
-			return abc.getUser();
+	public User validateToken(String token, String email) {
+		TokenCheck tokenObject = tokenRepository.findByToken(token);
+//		if (abc == null) {
+//			User oldUser = repository.findByEmail(email);
+//			if (email.equals(oldUser.getEmail()) && !isTokenExpired(token)) {
+//				return oldUser;
+//			}
+//		}
+		// final String username = extractUsername(token);
+		if (email.equals(tokenObject.getUser().getEmail()) && !isTokenExpired(token)) {
+			return tokenObject.getUser();
 		}
 		return null;
 	}

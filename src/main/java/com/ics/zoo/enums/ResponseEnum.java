@@ -16,7 +16,8 @@ public enum ResponseEnum
 	UPDATE_PASSWORD_REQUEST("Update Password Request"),
 	CONSTRAINT_FAILS("Cannot delete,a foreign key constraint fails"),
 	INCORRECT_OLD_PASSWORD("Incorrect Old Password!!"),
-	TOKEN_BIT_CHANGE("Token bit change");
+	TOKEN_BIT_CHANGE("Token bit change"),
+	NULL_TOKEN("Token is null");
 	
 private String message;
 
