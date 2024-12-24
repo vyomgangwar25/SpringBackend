@@ -2,6 +2,7 @@ package com.ics.zoo.filter;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,7 @@ public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				User userDetails = jwtutil.validateToken(token_frontend, username);
 				if (userDetails != null) {
+					
 					User user = (User) rolePrivilageService.loadUserByUsername(userDetails);
 					// Set the authentication in the context to mark the user as authenticated
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,

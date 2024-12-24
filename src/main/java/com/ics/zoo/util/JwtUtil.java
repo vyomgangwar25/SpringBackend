@@ -76,6 +76,10 @@ public class JwtUtil {
 
 	public User validateToken(String token, String email) {
 		TokenCheck tokenObject = tokenRepository.findByToken(token);
+		if(tokenObject==null)
+		{
+			return null;
+		}
 //		if (abc == null) {
 //			User oldUser = repository.findByEmail(email);
 //			if (email.equals(oldUser.getEmail()) && !isTokenExpired(token)) {

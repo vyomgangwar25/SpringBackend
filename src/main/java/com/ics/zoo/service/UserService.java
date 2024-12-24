@@ -1,7 +1,6 @@
 package com.ics.zoo.service;
 
 import java.util.List;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -67,7 +66,7 @@ public class UserService extends AbstractService<UserRepository> {
 			String token = tokenHeader.substring(7);
 			TokenCheck tcObject = tokenRepository.findByToken(token);
 			tcObject.setIsvalid(0);
-			tokenRepository.save(tcObject);
+			tokenRepository.deleteById(tcObject.getId());
 			return ResponseEntity.ok(ResponseEnum.TOKEN_BIT_CHANGE.getMessage());
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseEnum.NOT_FOUND.getMessage());
@@ -111,16 +110,17 @@ public class UserService extends AbstractService<UserRepository> {
 		throw new ResponseStatusException(HttpStatus.CONFLICT, ResponseEnum.TOKEN_NOT_RECEIVED.getMessage());
 	}
 
-	public ResponseEntity<?> forgetPassword(String email) {
+	public ResponseEntity<String> forgetPassword(String email) {
 		User existUser = getRepository().findByEmail(email);
 		if (existUser == null) {
 			return ResponseEntity.status(404).body(ResponseEnum.USER_NOT_FOUND.getMessage());
 		} else {
 			String forgetpassToken = jwtutil.generateToken(existUser);
-			 Set<String> url = urlConstant.generateUrl(forgetpassToken);
+			String key = urlConstant.UrlKey(forgetpassToken);
+			String value = urlConstant.getUrlValue(key);
 			String subject = ResponseEnum.UPDATE_PASSWORD_REQUEST.getMessage();
-			emailService.sendMail(email, subject, url);
-			return ResponseEntity.ok(url);
+			emailService.sendMail(email, subject, value);
+			return ResponseEntity.ok(key);
 		}
 	}
 
@@ -131,7 +131,6 @@ public class UserService extends AbstractService<UserRepository> {
 		}
 		String encodedPassword = passwordEncoder.encode(password.getNewpassword());
 		user.setPassword(encodedPassword);
-		user.setAuthority(null);
 		getRepository().save(user);
 		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}
@@ -140,14 +139,16 @@ public class UserService extends AbstractService<UserRepository> {
 		if (tokenHeader != null) {
 			String key = tokenHeader.substring(7);
 			String value = urlConstant.getUrlValue(key);
+			if (value.equals("no value found!!")) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.EXPIRED_TOKEN.getMessage());
+			}
 			String useremail = jwtutil.extractUsername(value);
 			User user = getRepository().findByEmail(useremail);
 			String encodedPassword = passwordEncoder.encode(password.getNewpassword());
 			user.setPassword(encodedPassword);
-			user.setAuthority(null);
 			getRepository().save(user);
-			return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
+			urlConstant.removeKey(key);
 		}
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseEnum.NULL_TOKEN.getMessage());
+		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}
 }

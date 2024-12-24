@@ -33,6 +33,8 @@ public class User extends Audit implements UserDetails {
 
 	private String role;
 
+	
+	@Transient
 	private Collection<? extends GrantedAuthority> authority;
 
 	public Collection<? extends GrantedAuthority> getAuthority() {

@@ -17,8 +17,8 @@ public enum ResponseEnum
 	CONSTRAINT_FAILS("Cannot delete,a foreign key constraint fails"),
 	INCORRECT_OLD_PASSWORD("Incorrect Old Password!!"),
 	TOKEN_BIT_CHANGE("Token bit change"),
-	NULL_TOKEN("Token is null");
-	
+	NULL_TOKEN("Token is null"),
+	EXPIRED_TOKEN("Token is expired");
 private String message;
 
 private ResponseEnum(String message) {

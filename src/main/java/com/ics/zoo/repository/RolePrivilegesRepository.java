@@ -12,5 +12,6 @@ import com.ics.zoo.entities.RolePrivileges;
 public interface RolePrivilegesRepository extends JpaRepository<RolePrivileges, Integer> {
 
   public List<RolePrivileges> findByRoleId(Integer id);
+  public List<RolePrivileges> findByRoleId_Role(String Role);
 
 }
