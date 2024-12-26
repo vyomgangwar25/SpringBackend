@@ -2,7 +2,6 @@ package com.ics.zoo.service;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +24,11 @@ import com.ics.zoo.repository.UserRepository;
 import com.ics.zoo.util.JwtUtil;
 import com.ics.zoo.util.UrlConstant;
 
+/**
+ * User Service
+ * @author Vyom Gangwar
+ */
+
 @Service
 public class UserService extends AbstractService<UserRepository> {
 	@Autowired
@@ -45,6 +49,15 @@ public class UserService extends AbstractService<UserRepository> {
 	@Autowired
 	private UrlConstant urlConstant;
 
+	/**
+	 * this method is used for login it first check if user is found in database or
+	 * not.If not found then return "user not found" else generate the token and
+	 * save the token, user object in tokenCheck table
+	 * 
+	 * @param userInput
+	 * @return information of user like name,role etc
+	 * @author Vyom Gangwar
+	 */
 	public ResponseEntity<?> login(LoginUserDTO userInput) {
 		User existingUser = getRepository().findByEmail(userInput.getEmail());
 		if (existingUser != null) {
@@ -61,34 +74,69 @@ public class UserService extends AbstractService<UserRepository> {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_EMAIL.getMessage());
 	}
 
+	/**
+	 * this is used to logout the user it checks the token in table and if the token
+	 * found then set the bit to 0
+	 * 
+	 * @param token
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
+
 	public ResponseEntity<String> logout(String tokenHeader) {
 		if (tokenHeader != null) {
 			String token = tokenHeader.substring(7);
 			TokenCheck tcObject = tokenRepository.findByToken(token);
 			tcObject.setIsvalid(0);
-			tokenRepository.deleteById(tcObject.getId());
+			tokenRepository.save(tcObject);
 			return ResponseEntity.ok(ResponseEnum.TOKEN_BIT_CHANGE.getMessage());
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseEnum.NOT_FOUND.getMessage());
 	}
 
+	/**
+	 * this method is used to create new user it first check if the user with given
+	 * email already exist or not if the user is not found then only register the
+	 * user else return "user already exist"
+	 * 
+	 * @param userInput
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
+
 	public ResponseEntity<String> register(UserDTO userInput) {
 		if (getRepository().findByEmail(userInput.email) == null) {
+
 			User user = modelMapper.map(userInput, User.class);
 			user.setPassword(passwordEncoder.encode(userInput.getPassword()));
+			user.setRoleId(userInput.getRoleId());
 			getRepository().save(user);
+
 			return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseEnum.ALREADY_EXIST.getMessage());
 	}
 
-	@Cacheable(value = "roles")
+	/**
+	 * this method is used to fetch the list of role
+	 * 
+	 * @return list of role
+	 * @author Vyom Gangwar
+	 */
 	public ResponseEntity<List<Roles>> roles() {
 		List<Roles> allroles = roleRepository.findAll();
 		return ResponseEntity.ok(allroles);
 	}
 
-	public ResponseEntity<String> update(Integer id, UserInfoDTO userDetails) {
+	/**
+	 * this method update the user  
+	 * it first find the user object using Id and then update the info of that user
+	 * 
+	 * @param id,userDetails
+	 * @author Vyom Gangwar
+	 */
+
+	public ResponseEntity<String> updateUser(Integer id, UserInfoDTO userDetails) {
 		try {
 			User user = getRepository().findById(id).get();
 			user.setUsername(userDetails.getName());
@@ -100,6 +148,14 @@ public class UserService extends AbstractService<UserRepository> {
 		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
 
+	/**
+	 * this method is used to find the user info it takes the token as param and
+	 * finds the user object from context then save the updated details
+	 * 
+	 * @param token
+	 * @author Vyom Gangwar
+	 */
+
 	public ResponseEntity<?> userInfo(String tokenHeader) {
 		if (tokenHeader != null) {
 			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -110,13 +166,22 @@ public class UserService extends AbstractService<UserRepository> {
 		throw new ResponseStatusException(HttpStatus.CONFLICT, ResponseEnum.TOKEN_NOT_RECEIVED.getMessage());
 	}
 
+	/**
+	 * this method firstly check the user with the particular email and if user is
+	 * not found then return "not found" if user is present then generate token and
+	 * set the token in hashmap with random key and return key as response
+	 * 
+	 * @param email
+	 * @return key
+	 * @author Vyom Gangwar
+	 */
 	public ResponseEntity<String> forgetPassword(String email) {
 		User existUser = getRepository().findByEmail(email);
 		if (existUser == null) {
 			return ResponseEntity.status(404).body(ResponseEnum.USER_NOT_FOUND.getMessage());
 		} else {
 			String forgetpassToken = jwtutil.generateToken(existUser);
-			String key = urlConstant.UrlKey(forgetpassToken);
+			String key = urlConstant.urlKey(forgetpassToken);
 			String value = urlConstant.getUrlValue(key);
 			String subject = ResponseEnum.UPDATE_PASSWORD_REQUEST.getMessage();
 			emailService.sendMail(email, subject, value);
@@ -124,7 +189,16 @@ public class UserService extends AbstractService<UserRepository> {
 		}
 	}
 
-	public ResponseEntity<String> updatepassword(String tokenHeader, PasswordDTO password) {
+	/**
+	 * this method is used to update the password it checks the current password .
+	 * if current password match then update with new password
+	 * 
+	 * @param token,password
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
+
+	public ResponseEntity<String> updatePassword(String tokenHeader, PasswordDTO password) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (!passwordEncoder.matches(password.getOldpassword(), user.getPassword())) {
 			return ResponseEntity.status(401).body(ResponseEnum.INCORRECT_OLD_PASSWORD.getMessage());
@@ -135,6 +209,14 @@ public class UserService extends AbstractService<UserRepository> {
 		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}
 
+	/**
+	 * this is used to set new password it receive key as @param,then find the
+	 * vlaue(token) for that key and set the new password
+	 * 
+	 * @param newPassword,token(key)
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
 	public ResponseEntity<String> setpassword(String tokenHeader, PasswordDTO password) {
 		if (tokenHeader != null) {
 			String key = tokenHeader.substring(7);
@@ -142,8 +224,8 @@ public class UserService extends AbstractService<UserRepository> {
 			if (value.equals("no value found!!")) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.EXPIRED_TOKEN.getMessage());
 			}
-			String useremail = jwtutil.extractUsername(value);
-			User user = getRepository().findByEmail(useremail);
+			String userEmail = jwtutil.extractUsername(value);
+			User user = getRepository().findByEmail(userEmail);
 			String encodedPassword = passwordEncoder.encode(password.getNewpassword());
 			user.setPassword(encodedPassword);
 			getRepository().save(user);

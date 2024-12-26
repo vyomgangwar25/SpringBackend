@@ -1,4 +1,5 @@
 package com.ics.zoo.config;
+
 import java.util.Arrays;
 
 import org.modelmapper.ModelMapper;
@@ -25,35 +26,43 @@ import com.ics.zoo.filter.ZooFilter;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize
 @EnableJpaAuditing(modifyOnCreate = false)
-public class SecurityConfig  {
+public class SecurityConfig {
 	/**
 	 * password encoder bean
 	 * 
 	 * @return BCryptPasswordEncoder
+	 *  @author Vyom Gangwar
 	 */
 	@Bean
 	BCryptPasswordEncoder passwordEncoder() {
 
 		return new BCryptPasswordEncoder();
 	}
-   
+
 	/**
 	 * ModelMapper bean
 	 * 
 	 * @return ModelMapper
+	 * @author Vyom Gangwar
 	 */
 	@Bean
 	ModelMapper modelMapper() {
 		return new ModelMapper();
 	}
 	
-	  @Bean
-	    public AuditorAware<String> auditorProvider() {
-	 
-	        return new AuditorAwareImpl();
-	    }
-	
-	 
+	/**
+	 * AuditorAware bean
+	 * @return AuditorAwareImpl
+	 * @author Vyom Gangwar
+	 * 
+	 * */
+
+	@Bean
+	public AuditorAware<String> auditorProvider() {
+
+		return new AuditorAwareImpl();
+	}
+
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
@@ -69,7 +78,7 @@ public class SecurityConfig  {
 	/**
 	 * SecurityFilterChain Config {@link ZooApplication}
 	 * 
-	 * @param http
+	 * @param http,filter
 	 * @return SecurityFilterChain
 	 * @throws Exception
 	 */
@@ -77,15 +86,12 @@ public class SecurityConfig  {
 	SecurityFilterChain securityFilterChain(HttpSecurity http, ZooFilter filter) throws Exception {
 		HttpSecurity security = http.csrf(csrf -> csrf.disable()).cors(cors -> {
 			cors.configurationSource(corsConfigurationSource());
-		})
-				.formLogin((form) -> form.disable())
-				.authorizeHttpRequests(
-						(requests) -> requests.requestMatchers(EndPoint.getEndPointsArray()).permitAll()
-					   .anyRequest().authenticated())
+		}).formLogin((form) -> form.disable())
+				.authorizeHttpRequests((requests) -> requests.requestMatchers(EndPoint.getEndPointsArray()).permitAll()
+						.anyRequest().authenticated())
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
 				.httpBasic(httpBasic -> httpBasic.disable());
 		return security.build();
 	}
-
 
 }

@@ -17,7 +17,7 @@ public class AnimalDTO {
 	@NotBlank(message = "gender is required")
 	private String gender;
 
-	@NotBlank(message = "dob is required")
+	 
 	private Date dob;
 
 	private Integer zooid;

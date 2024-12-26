@@ -16,11 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ics.zoo.entities.RolePrivileges;
-import com.ics.zoo.entities.Roles;
 import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.repository.RolePrivilegesRepository;
-import com.ics.zoo.repository.RoleRepository;
+
 import com.ics.zoo.repository.TokenRepository;
 
 import io.jsonwebtoken.Claims;
@@ -32,9 +31,6 @@ import io.jsonwebtoken.impl.DefaultJwtParserBuilder;
 public class JwtUtil {
 	@Autowired
 	private RolePrivilegesRepository rolePrivilegeList;
-
-	@Autowired
-	private RoleRepository roleRepository;
 
 	@Autowired
 	private TokenRepository tokenRepository;
@@ -61,23 +57,20 @@ public class JwtUtil {
 		Map<String, Object> claims = new HashMap<>();
 
 		List<Integer> privilegeList = new ArrayList<>();
-		Roles role = roleRepository.findByRole(userDetails.getRole());
 
-		List<RolePrivileges> ll = rolePrivilegeList.findByRoleId(role.getId());
-		for (RolePrivileges roleprivileges : ll) {
+		List<RolePrivileges> ll = rolePrivilegeList.findByRoleId(userDetails.getRoleId());
+
+		for (RolePrivileges roleprivileges : ll) 
+		{
 			privilegeList.add(roleprivileges.getPrivileges().getId());
-
 		}
-
 		claims.put("authority", privilegeList);
-
 		return createToken(claims, userDetails.getEmail());
 	}
 
 	public User validateToken(String token, String email) {
 		TokenCheck tokenObject = tokenRepository.findByToken(token);
-		if(tokenObject==null)
-		{
+		if (tokenObject == null) {
 			return null;
 		}
 //		if (abc == null) {

@@ -26,6 +26,12 @@ import com.ics.zoo.repository.AnimalRepository;
 import com.ics.zoo.repository.AnimalTransferHistoryRepository;
 import com.ics.zoo.repository.ZooRepository;
 
+
+/**
+ * animal service
+ * @author Vyom Gangwar
+ * 
+ * */
 @Service
 public class AnimalService extends AbstractService<AnimalRepository> {
 	@Autowired
@@ -34,12 +40,26 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 	@Autowired
 	private AnimalTransferHistoryRepository historyRepository;
 
+	/**
+	 * this method is used to create a new animal
+	 * @param animalinput
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
+	
 	public ResponseEntity<String> registration(AnimalDTO animalinput) {
 		Animal newAnimal = modelMapper.map(animalinput, Animal.class);
 		newAnimal.setZoo(zooRepository.findById(animalinput.getZooid()).get());
 		getRepository().save(newAnimal);
 		return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
 	}
+	
+	/**
+	 * this method returns the list of animal in zoo
+	 * 
+	 * @param id,page and pagesize. page and pagesize is used in pagination
+	 * @author Vyom Gangwar
+	 */
 
 	public ResponseEntity<HashMap<String, Object>> extract(Integer id, Integer page, Integer pagesize) {
 		Page<Animal> pageAnimal = getRepository().findByZooId(id, PageRequest.of(page, pagesize));
@@ -56,6 +76,15 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 		return ResponseEntity.ok(response);
 	}
 
+	/**
+	 * this method is used to update the animal information
+	 * it first find the animal object using Id and then update the info of that animal
+	 * 
+	 * @param id,updateanimal
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
+	
 	public ResponseEntity<String> update(Integer id, AnimalUpdateDTO updateanimal) {
 		// updateanimal.setId(id);
 		Animal animaldata = getRepository().findById(id).get();
@@ -64,6 +93,15 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 		getRepository().save(animaldata);
 		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
+	
+	/**
+	 * this method is used to delete the animal
+	 * it first  check it the animal is exist or not?
+	 * if exist then first delete the history of that animal and then delete the animal
+	 * @param id
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 **/
 
 	public ResponseEntity<String> delete(Integer id) {
 		if (getRepository().existsById(id)) {
@@ -75,10 +113,27 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 		}
 		return ResponseEntity.status(404).body(ResponseEnum.NOT_FOUND.getMessage());
 	}
-
+ 
+	
+	/**
+	 * this method returns the list of zoo except the zoo whose ID we are passing
+	 * 
+	 * @param zooid
+	 * @return ResponseEntity<List<Zoo>>
+	 * @author Vyom Gangwar
+	 */
 	public ResponseEntity<List<Zoo>> transferableZooList(Integer zooId) {
 		return ResponseEntity.ok(zooRepository.findAllByIdNot(zooId));
 	}
+	
+	/**
+	 * this method is used to transfer the animal from one zoo to another
+	 * we use animalid to find the animal object and then extract the info of the zoo in which it currently exist
+	 * then we use @param zooid to tranfer the animal to particular zoo
+	 * @param animalid,zooid
+	 * @return ResponseEntity<String>  
+	 * @author Vyom Gangwar
+	 */
 
 	public ResponseEntity<String> transfer(Integer animalid, Integer zooid) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -94,6 +149,13 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 		}
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseEnum.NOT_FOUND.getMessage());
 	}
+	
+	/**
+	 * this method return the history of animal
+	 * @param animalId
+	 * @return history of animal
+	 * @author Vyom Gangwar
+	 */
 
 	public ResponseEntity<?> history(Integer animalId) {
 		List<AnimalTransferHistory> historyList = historyRepository.findByAnimalId(animalId);

@@ -31,50 +31,117 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/user")
 public class UserController extends AbstractController<UserService> {
+	/**
+	 * this method is used for login
+	 * 
+	 * @param userInput
+	 * @return information of user like name,role etc
+	 * @author Vyom Gangwar
+	 */
+
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@Valid @RequestBody LoginUserDTO userInput) {
 		return getService().login(userInput);
 	}
+
+	/**
+	 * this method is used to create new user
+	 * 
+	 * @param userInput
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
 
 	@PostMapping("/registration")
 	public ResponseEntity<String> registration(@Valid @RequestBody UserDTO userInput) {
 		return getService().register(userInput);
 	}
 
+	/**
+	 * this is used to logout the user
+	 * 
+	 * @param token
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
+
 	@PostMapping("/logout")
 	public ResponseEntity<String> logout(@RequestHeader("Authorization") String tokenHeader) {
 		return getService().logout(tokenHeader);
 	}
 
+	/**
+	 * this is used to fetch role
+	 * 
+	 * @return ResponseEntity<List<Roles>>
+	 * @author Vyom Gangwar
+	 */
 	@GetMapping("/fetchroles")
 	public ResponseEntity<List<Roles>> roles() {
 		return getService().roles();
 	}
 
+	/**
+	 * this is used to update the user info
+	 * 
+	 * @param id,userDetails
+	 * @return ResponseEntity<String>
+	 * @author Vyom gangwar
+	 **/
 	@PutMapping("/update/{id}")
 	public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody UserInfoDTO userDetails) {
-		return getService().update(id, userDetails);
+		return getService().updateUser(id, userDetails);
 	}
+
+	/**
+	 * this return the user info
+	 * 
+	 * @param token
+	 * @author Vyom Gangwar
+	 */
 
 	@GetMapping("/userinfo")
 	public ResponseEntity<?> userInfo(@RequestHeader("Authorization") String tokenHeader) {
 		return getService().userInfo(tokenHeader);
 	}
 
+	/**
+	 * this method send the reset password link on user email and also return key
+	 * 
+	 * @param email
+	 * @return key
+	 * @author Vyom Gangwar
+	 */
 	@PostMapping("/forgetpassword")
-	public ResponseEntity<?> forgetPassword(@RequestBody String email) {
+	public ResponseEntity<String> forgetPassword(@RequestBody String email) {
 		return getService().forgetPassword(email);
 	}
 
-	@PostMapping("/updatepassword") 
-	public ResponseEntity<String>  updatepassword(@RequestHeader("Authorization") String tokenHeader,
+	/**
+	 * this method is used to update the password
+	 * 
+	 * @param token,password
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
+
+	@PostMapping("/updatepassword")
+	public ResponseEntity<String> updatepassword(@RequestHeader("Authorization") String tokenHeader,
 			@Valid @RequestBody PasswordDTO password) {
-		return getService().updatepassword(tokenHeader, password);
+		return getService().updatePassword(tokenHeader, password);
 	}
 
+	/**
+	 * this is used to set new password
+	 * 
+	 * @param newPassword,token(key)
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 * 
+	 */
 	@PostMapping("/setnewpassword")
 	public ResponseEntity<String> setpassword(@RequestHeader("Authorization2") String tokenHeader,
-			  @RequestBody PasswordDTO password) {
+			@RequestBody PasswordDTO password) {
 		return getService().setpassword(tokenHeader, password);
 	}
 }

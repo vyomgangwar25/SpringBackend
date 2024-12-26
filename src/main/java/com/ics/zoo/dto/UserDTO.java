@@ -20,7 +20,7 @@ public class UserDTO extends LoginUserDTO {
 	public String username;
 
 	@NotNull(message = "enter role")
-	public String role;
+	public Integer roleId;
 	//private Collection<? extends GrantedAuthority> authority;
 
 	

@@ -14,15 +14,28 @@ import com.ics.zoo.dto.ZooRegistrationDTO;
 import com.ics.zoo.entities.Zoo;
 import com.ics.zoo.enums.ResponseEnum;
 import com.ics.zoo.repository.ZooRepository;
-
+/**
+ * Zoo Service 
+ * @author Vyom Gangwar
+ * */
 @Service
 public class ZooService extends AbstractService<ZooRepository> {
-
+   /**
+    * this is used to create new zoo
+    * @param zooInput
+    * @return ResponseEntity<String>
+    * */
 	public ResponseEntity<String> register(ZooRegistrationDTO zooInput) {
 		Zoo newZoo = modelMapper.map(zooInput, Zoo.class);
 		getRepository().save(newZoo);
 		return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
 	}
+	
+	/**
+	 * this is used to extract the list of zoo
+	 *  @param id,page and pagesize. 
+	 *  page and pagesize is used in pagination
+	 * */
 
 	public ResponseEntity<HashMap<String, Object>> extract(Integer page, Integer pagesize) {
 		Page<Zoo> pagezoo = getRepository().findAll(PageRequest.of(page, pagesize));
@@ -36,6 +49,12 @@ public class ZooService extends AbstractService<ZooRepository> {
 		response.put("totalzoo", getRepository().count());
 		return ResponseEntity.ok(response);
 	}
+	
+	/**
+	 * this is used to update the zoo
+	 * @param id,updatezoo
+	 * @return ResponseEntity<String>
+	 * */
 
 	public ResponseEntity<String> update(Integer id, ZooRegistrationDTO updatezoo) {
 
@@ -46,7 +65,11 @@ public class ZooService extends AbstractService<ZooRepository> {
 		}
 		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
-
+	/**
+	 * this is used to delete the zoo
+	 * @param id
+	 * @return ResponseEntity<String>
+	 * */
 	public ResponseEntity<String> delete(Integer id) {
 		try {
 			if (getRepository().existsById(id)) {

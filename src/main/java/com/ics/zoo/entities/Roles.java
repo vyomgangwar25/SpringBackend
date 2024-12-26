@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Roles extends CommonEntity {
+public class Roles extends CommonEntity 
+{
 	private String role;
-
 }

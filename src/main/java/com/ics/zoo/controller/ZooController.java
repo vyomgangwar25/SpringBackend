@@ -27,20 +27,48 @@ import jakarta.validation.Valid;
 @RequestMapping("/zoo")
 public class ZooController extends AbstractController<ZooService> {
 
+	/**
+	 * this is used to create new zoo
+	 * 
+	 * @param zooinput
+	 * @return ResponseEntity<String> create
+	 * @author Vyom Gangwar
+	 */
 	@PostMapping("/create")
 	public ResponseEntity<String> create(@Valid @RequestBody ZooRegistrationDTO zooInput) {
 		return getService().register(zooInput);
 	}
 
+	/**
+	 * this method return list of zoo
+	 * 
+	 * @param id,page and pagesize. page and pagesize is used in pagination
+	 * @author Vyom Gangwar
+	 */
 	@GetMapping("/list")
 	public ResponseEntity<HashMap<String, Object>> list(@RequestParam Integer page, @RequestParam Integer pagesize) {
 		return getService().extract(page, pagesize);
 	}
 
+	/**
+	 * this method is used to update the zoo data
+	 * 
+	 * @param id,updatezoo
+	 * @return ResponseEntity<String> update
+	 * @author Vyom Gangwar
+	 */
 	@PutMapping("/update/{id}")
 	public ResponseEntity<String> update(@PathVariable Integer id, @Valid @RequestBody ZooRegistrationDTO updatezoo) {
 		return getService().update(id, updatezoo);
 	}
+
+	/**
+	 * this method is used to delete the zoo
+	 * 
+	 * @param id
+	 * @return ResponseEntity<String> delete
+	 * @author Vyom Gangwar
+	 */
 
 	@PreAuthorize("hasAuthority('AUTHORITY_3')")
 	@DeleteMapping("/delete/{id}")

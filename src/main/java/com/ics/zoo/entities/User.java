@@ -31,7 +31,7 @@ public class User extends Audit implements UserDetails {
 
 	private String password;
 
-	private String role;
+	private Integer roleId;
 
 	
 	@Transient

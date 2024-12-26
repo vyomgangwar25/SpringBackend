@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 public class UrlConstant {
 
 	HashMap<String, String> hm = new HashMap<>();
-	public String UrlKey(String token) {
-		String key = RandomNo().toString();
+	public String urlKey(String token) {
+		String key = randomNo().toString();
 		hm.put(key, token);
 		return key;
 	}
@@ -22,7 +22,7 @@ public class UrlConstant {
 		return value;
 	}
 
-	public Integer RandomNo() {
+	public Integer randomNo() {
 		Random random = new Random();
 		int no = random.nextInt(99);
 		return no;

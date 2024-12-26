@@ -24,4 +24,4 @@ public class RolePrivileges extends CommonEntity {
 	@JoinColumn(name = "privilege_id", referencedColumnName = "id")
 	private Privileges privileges;
 
-}
+}  

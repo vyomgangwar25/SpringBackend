@@ -7,11 +7,19 @@ import org.springframework.stereotype.Repository;
 
 import com.ics.zoo.entities.RolePrivileges;
  
-
+/**
+ * 
+ * Doc
+ *
+ * @author Vyom Gangwar
+ * @since 24-Dec-2024
+ */
 @Repository
-public interface RolePrivilegesRepository extends JpaRepository<RolePrivileges, Integer> {
+public interface RolePrivilegesRepository extends JpaRepository<RolePrivileges, Integer> 
+{
 
   public List<RolePrivileges> findByRoleId(Integer id);
-  public List<RolePrivileges> findByRoleId_Role(String Role);
+  
+ // public List<RolePrivilege> findByRoleId_Name(String roleName);
 
 }
