@@ -31,7 +31,7 @@ public class SecurityConfig {
 	 * password encoder bean
 	 * 
 	 * @return BCryptPasswordEncoder
-	 *  @author Vyom Gangwar
+	 * @author Vyom Gangwar
 	 */
 	@Bean
 	BCryptPasswordEncoder passwordEncoder() {
@@ -49,19 +49,26 @@ public class SecurityConfig {
 	ModelMapper modelMapper() {
 		return new ModelMapper();
 	}
-	
+
 	/**
 	 * AuditorAware bean
-	 * @return AuditorAwareImpl
-	 * @author Vyom Gangwar
 	 * 
-	 * */
+	 * @return AuditorAwareImpl
+	 * @author Vyom Gangwar 
+	 */
 
 	@Bean
 	public AuditorAware<String> auditorProvider() {
 
 		return new AuditorAwareImpl();
 	}
+
+	/**
+	 * corsConfigurationSource bean
+	 * 
+	 * @return source
+	 * @author Vyom Gangwar 
+	 */
 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {

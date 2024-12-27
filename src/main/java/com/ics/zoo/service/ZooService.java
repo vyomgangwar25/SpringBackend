@@ -14,28 +14,31 @@ import com.ics.zoo.dto.ZooRegistrationDTO;
 import com.ics.zoo.entities.Zoo;
 import com.ics.zoo.enums.ResponseEnum;
 import com.ics.zoo.repository.ZooRepository;
+
 /**
- * Zoo Service 
+ * Zoo Service
+ * 
  * @author Vyom Gangwar
- * */
+ */
 @Service
 public class ZooService extends AbstractService<ZooRepository> {
-   /**
-    * this is used to create new zoo
-    * @param zooInput
-    * @return ResponseEntity<String>
-    * */
+	/**
+	 * this is used to create new zoo
+	 * 
+	 * @param zooInput
+	 * @return ResponseEntity<String>
+	 */
 	public ResponseEntity<String> register(ZooRegistrationDTO zooInput) {
 		Zoo newZoo = modelMapper.map(zooInput, Zoo.class);
 		getRepository().save(newZoo);
 		return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
 	}
-	
+
 	/**
 	 * this is used to extract the list of zoo
-	 *  @param id,page and pagesize. 
-	 *  page and pagesize is used in pagination
-	 * */
+	 * 
+	 * @param id,page and pagesize. page and pagesize is used in pagination
+	 */
 
 	public ResponseEntity<HashMap<String, Object>> extract(Integer page, Integer pagesize) {
 		Page<Zoo> pagezoo = getRepository().findAll(PageRequest.of(page, pagesize));
@@ -49,12 +52,15 @@ public class ZooService extends AbstractService<ZooRepository> {
 		response.put("totalzoo", getRepository().count());
 		return ResponseEntity.ok(response);
 	}
-	
+
 	/**
-	 * this is used to update the zoo
+	 * this is used to update the zoo.
+	 * it first find the zoo with id and then update
+	 * the zoo info
+	 * 
 	 * @param id,updatezoo
 	 * @return ResponseEntity<String>
-	 * */
+	 */
 
 	public ResponseEntity<String> update(Integer id, ZooRegistrationDTO updatezoo) {
 
@@ -65,11 +71,14 @@ public class ZooService extends AbstractService<ZooRepository> {
 		}
 		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
+
 	/**
-	 * this is used to delete the zoo
+	 * this is used to delete the zoo.it first check if the zoo is exist or not? if
+	 * exist then delete the zoo
+	 * 
 	 * @param id
 	 * @return ResponseEntity<String>
-	 * */
+	 */
 	public ResponseEntity<String> delete(Integer id) {
 		try {
 			if (getRepository().existsById(id)) {

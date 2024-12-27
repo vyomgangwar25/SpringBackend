@@ -4,7 +4,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-
+/**
+ * CommonEntity
+ * @author Vyom Gangwar
+ * 
+ * */
 @MappedSuperclass
 public class CommonEntity 
 {

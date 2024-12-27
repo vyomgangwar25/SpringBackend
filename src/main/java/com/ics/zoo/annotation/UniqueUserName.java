@@ -17,7 +17,6 @@ import jakarta.validation.Payload;
  * 
  * @author Vyom Gangwar 
  * 
- * 
  */
 public @interface UniqueUserName {
 	String message() default "user with this name is already exists";

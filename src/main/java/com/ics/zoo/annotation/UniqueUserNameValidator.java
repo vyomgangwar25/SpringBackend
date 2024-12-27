@@ -7,6 +7,12 @@ import com.ics.zoo.repository.UserRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
+/**
+ * UniqueUserNameValidator
+ * 
+ * @author Vyom Gangwar
+ **/
+
 public class UniqueUserNameValidator implements ConstraintValidator<UniqueUserName, String> {
 	@Autowired
 	private UserRepository repository;

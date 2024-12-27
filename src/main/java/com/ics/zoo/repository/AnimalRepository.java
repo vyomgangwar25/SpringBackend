@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ics.zoo.entities.Animal;
 
 /**
- * Doc
- *
+ * AnimalRepository
  * @author Vyom Gangwar
  * @since 03-Dec-2024
  */

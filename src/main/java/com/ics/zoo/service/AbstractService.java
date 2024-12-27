@@ -4,6 +4,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+
+/**
+ * Abstract Service
+ * @author Vyom Gangwar
+ * **/
 public abstract class AbstractService<T extends JpaRepository<?, ?>>
 {
 	@Autowired

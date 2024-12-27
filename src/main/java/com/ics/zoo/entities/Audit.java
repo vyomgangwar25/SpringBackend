@@ -11,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
@@ -34,7 +33,7 @@ import lombok.Setter;
 @EntityListeners(AuditingEntityListener.class)
 
 public class Audit extends CommonEntity {
-    @Column(updatable = false)
+	@Column(updatable = false)
 	@CreatedBy
 	private String createdBy;
 
@@ -45,7 +44,7 @@ public class Audit extends CommonEntity {
 	 * @Temporal(TemporalType.TIMESTAMP):stores both date and time.
 	 * 
 	 */
-    @Column(updatable = false)
+	@Column(updatable = false)
 	@CreatedDate
 	@Temporal(TemporalType.DATE)
 	private Date createdAt;

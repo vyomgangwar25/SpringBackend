@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 import com.ics.zoo.entities.RolePrivileges;
  
 /**
- * 
- * Doc
  *
  * @author Vyom Gangwar
  * @since 24-Dec-2024

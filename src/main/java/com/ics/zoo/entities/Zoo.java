@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,8 +15,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+/**
+ * Zoo Entity
+ * 
+ * @author Vyom Gangwar
+ * 
+ ***/
 @Entity
-
 public class Zoo extends Audit {
 
 	@NotBlank(message = "Name is required")

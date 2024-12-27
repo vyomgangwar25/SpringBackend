@@ -15,6 +15,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 
+/**
+ * Animal Entity
+ * @author Vyom Gangwar
+ * */
+
 @Entity
 public class Animal extends CommonEntity {
 

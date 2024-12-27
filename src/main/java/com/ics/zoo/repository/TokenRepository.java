@@ -5,13 +5,19 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ics.zoo.entities.TokenCheck;
-import com.ics.zoo.entities.User;
 
-import ch.qos.logback.core.subst.Token;
+/**
+ * TokenRepository
+ * 
+ * @author Vyom Gangwar
+ * @since 03-Dec-2024
+ * 
+ ***/
 
 public interface TokenRepository extends JpaRepository<TokenCheck, Integer> {
-	 
 
 	public List<TokenCheck> findByUser_Id(Integer userid);
+
 	public TokenCheck findByToken(String token);
+	public List<TokenCheck> findByIsvalid(Boolean value);
 }

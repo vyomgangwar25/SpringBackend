@@ -13,9 +13,15 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+
+/**
+ * RolePrivileges Entity
+ * @author Vyom Gangwar
+ * 
+ * **/
 @Entity
 public class RolePrivileges extends CommonEntity {
-
+    
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "role_id", referencedColumnName = "id")
 	private Roles role;

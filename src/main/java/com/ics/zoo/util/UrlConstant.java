@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.Random;
 import org.springframework.stereotype.Component;
 
+/**
+ * UrlConstant
+ * @author Vyom Gangwar
+ * */
 @Component
 public class UrlConstant {
 

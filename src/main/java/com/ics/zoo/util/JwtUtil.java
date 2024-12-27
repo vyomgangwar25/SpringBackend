@@ -27,6 +27,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultJwtParserBuilder;
 
+/**
+ * JwtUtil
+ * 
+ * @author Vyom Gangwar
+ **/
+
 @Component
 public class JwtUtil {
 	@Autowired
@@ -37,6 +43,12 @@ public class JwtUtil {
 
 	private String SECRET_KEY = "2D4A614E645267556B58703273357638792F423F4428472B4B6250655368566D";
 
+	/**
+	 * this method is used to create a new token. token is valid for 2 hrs
+	 * 
+	 * @param claims,userName
+	 * @author Vyom Gangwar
+	 */
 	private String createToken(Map<String, Object> claims, String userName) {
 		return Jwts.builder().setClaims(claims).setSubject(userName).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + Duration.ofHours(2).toMillis()))
@@ -53,6 +65,9 @@ public class JwtUtil {
 		return secretKey;
 	}
 
+	/**
+	 * save the privileges and email
+	 */
 	public String generateToken(User userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 
@@ -60,19 +75,28 @@ public class JwtUtil {
 
 		List<RolePrivileges> ll = rolePrivilegeList.findByRoleId(userDetails.getRoleId());
 
-		for (RolePrivileges roleprivileges : ll) 
-		{
+		for (RolePrivileges roleprivileges : ll) {
 			privilegeList.add(roleprivileges.getPrivileges().getId());
 		}
 		claims.put("authority", privilegeList);
 		return createToken(claims, userDetails.getEmail());
 	}
 
+	/**
+	 * this is used to validate the token
+	 * 
+	 * @param token ,email
+	 * 
+	 **/
 	public User validateToken(String token, String email) {
 		TokenCheck tokenObject = tokenRepository.findByToken(token);
 		if (tokenObject == null) {
 			return null;
 		}
+		if (tokenObject.getIsvalid() != false)
+			if (email.equals(tokenObject.getUser().getEmail()) && !isTokenExpired(token)) {
+				return tokenObject.getUser();
+			}
 //		if (abc == null) {
 //			User oldUser = repository.findByEmail(email);
 //			if (email.equals(oldUser.getEmail()) && !isTokenExpired(token)) {
@@ -80,9 +104,7 @@ public class JwtUtil {
 //			}
 //		}
 		// final String username = extractUsername(token);
-		if (email.equals(tokenObject.getUser().getEmail()) && !isTokenExpired(token)) {
-			return tokenObject.getUser();
-		}
+
 		return null;
 	}
 

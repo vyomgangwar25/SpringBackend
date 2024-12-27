@@ -14,6 +14,11 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+
+/**
+ * AnimalTransferHistory Entity
+ * @author Vyom Gangwar
+ * */
 @Entity
 public class AnimalTransferHistory extends CommonEntity {
 

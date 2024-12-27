@@ -20,8 +20,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+/**
+ * User Entity
+ * 
+ * @author Vyom Gangwar
+ */
 @Entity
-
 public class User extends Audit implements UserDetails {
 	private static final long serialVersionUID = 1L;
 
@@ -33,7 +37,6 @@ public class User extends Audit implements UserDetails {
 
 	private Integer roleId;
 
-	
 	@Transient
 	private Collection<? extends GrantedAuthority> authority;
 

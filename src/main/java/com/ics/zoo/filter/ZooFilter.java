@@ -2,7 +2,7 @@ package com.ics.zoo.filter;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -16,8 +16,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Custom filter
+ * 
+ * @author Vyom Gangwar
+ */
 @Component
-public class ZooFilter extends OncePerRequestFilter { /* custom filter */
+public class ZooFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private JwtUtil jwtutil;
@@ -25,6 +30,11 @@ public class ZooFilter extends OncePerRequestFilter { /* custom filter */
 	@Autowired
 	private RolePrivilageService rolePrivilageService;
 
+	/**
+	 * this method checks the token validation and set the user information and Authority in the context
+	 * @param request,response,filterChain
+	 * @throws ServletException,IOException
+	 * **/
 	@Override
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {

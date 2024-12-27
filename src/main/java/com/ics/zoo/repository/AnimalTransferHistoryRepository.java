@@ -6,6 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import com.ics.zoo.entities.AnimalTransferHistory;
 
+
+/**
+ * AnimalTransferHistoryRepository
+ * 
+ * @author Vyom Gangwar
+ * @since 03-Dec-2024
+ * 
+ */
 @Repository
 public interface AnimalTransferHistoryRepository extends JpaRepository<AnimalTransferHistory, Integer>
 {

@@ -65,7 +65,7 @@ public class UserService extends AbstractService<UserRepository> {
 				String generated_token = jwtutil.generateToken(existingUser);
 				LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
 				response.setToken(generated_token);
-				TokenCheck tokenCheck = new TokenCheck(generated_token, 1, existingUser);
+				TokenCheck tokenCheck = new TokenCheck(generated_token, true, existingUser);
 				tokenRepository.save(tokenCheck);
 				return ResponseEntity.ok(response);
 			}
@@ -87,7 +87,7 @@ public class UserService extends AbstractService<UserRepository> {
 		if (tokenHeader != null) {
 			String token = tokenHeader.substring(7);
 			TokenCheck tcObject = tokenRepository.findByToken(token);
-			tcObject.setIsvalid(0);
+			tcObject.setIsvalid(false);
 			tokenRepository.save(tcObject);
 			return ResponseEntity.ok(ResponseEnum.TOKEN_BIT_CHANGE.getMessage());
 		}
@@ -190,7 +190,8 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this method is used to update the password it checks the current password .
+	 * this method is used to update the password .
+	 * it checks the current password .
 	 * if current password match then update with new password
 	 * 
 	 * @param token,password
@@ -210,7 +211,8 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this is used to set new password it receive key as @param,then find the
+	 * this is used to set new password.
+	 * it receive key as @param,then find the
 	 * vlaue(token) for that key and set the new password
 	 * 
 	 * @param newPassword,token(key)
