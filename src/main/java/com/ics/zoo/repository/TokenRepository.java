@@ -16,7 +16,7 @@ import com.ics.zoo.entities.TokenCheck;
 
 public interface TokenRepository extends JpaRepository<TokenCheck, Integer> {
 
-	public List<TokenCheck> findByUser_Id(Integer userid);
+//	public List<TokenCheck> findByUser_Id(Integer userid);
 
 	public TokenCheck findByToken(String token);
 	public List<TokenCheck> findByIsvalid(Boolean value);

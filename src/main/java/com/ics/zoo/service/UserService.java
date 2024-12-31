@@ -1,6 +1,7 @@
 package com.ics.zoo.service;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import com.ics.zoo.dto.LoginResponseDTO;
 import com.ics.zoo.dto.LoginUserDTO;
 import com.ics.zoo.dto.PasswordDTO;
@@ -26,6 +28,7 @@ import com.ics.zoo.util.UrlConstant;
 
 /**
  * User Service
+ * 
  * @author Vyom Gangwar
  */
 
@@ -65,8 +68,10 @@ public class UserService extends AbstractService<UserRepository> {
 				String generated_token = jwtutil.generateToken(existingUser);
 				LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
 				response.setToken(generated_token);
-				TokenCheck tokenCheck = new TokenCheck(generated_token, true, existingUser);
-				tokenRepository.save(tokenCheck);
+				// TokenCheck tokenCheck = new TokenCheck(generated_token, true, existingUser);
+				TokenCheck tokencheck = TokenCheck.builder().token(generated_token).isvalid(true).user(existingUser)
+						.build();
+				tokenRepository.save(tokencheck);
 				return ResponseEntity.ok(response);
 			}
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_PASSWORD.getMessage());
@@ -86,18 +91,18 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<String> logout(String tokenHeader) {
 		if (tokenHeader != null) {
 			String token = tokenHeader.substring(7);
-			TokenCheck tcObject = tokenRepository.findByToken(token);
-			tcObject.setIsvalid(false);
-			tokenRepository.save(tcObject);
+			TokenCheck tokenCheck = tokenRepository.findByToken(token);
+			tokenCheck.setIsvalid(false);
+			tokenRepository.save(tokenCheck);
 			return ResponseEntity.ok(ResponseEnum.TOKEN_BIT_CHANGE.getMessage());
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseEnum.NOT_FOUND.getMessage());
 	}
 
 	/**
-	 * this method is used to create new user it first check if the user with given
-	 * email already exist or not if the user is not found then only register the
-	 * user else return "user already exist"
+	 * this method is used to create new user. it first check if the user with given
+	 * email already exist or not. if the user is not found then only register the
+	 * user else return "user already exist".
 	 * 
 	 * @param userInput
 	 * @return ResponseEntity<String>
@@ -129,8 +134,8 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this method update the user  
-	 * it first find the user object using Id and then update the info of that user
+	 * this method update the user it first find the user object using Id and then
+	 * update the info of that user
 	 * 
 	 * @param id,userDetails
 	 * @author Vyom Gangwar
@@ -141,6 +146,9 @@ public class UserService extends AbstractService<UserRepository> {
 			User user = getRepository().findById(id).get();
 			user.setUsername(userDetails.getName());
 			user.setEmail(userDetails.getEmail());
+
+			// User updateUser =
+			// User.builder().username(userDetails.getName()).email(userDetails.getEmail()).build();
 			getRepository().save(user);
 		} catch (DataIntegrityViolationException e) {
 			throw e;
@@ -190,8 +198,7 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this method is used to update the password .
-	 * it checks the current password .
+	 * this method is used to update the password . it checks the current password .
 	 * if current password match then update with new password
 	 * 
 	 * @param token,password
@@ -211,8 +218,7 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this is used to set new password.
-	 * it receive key as @param,then find the
+	 * this is used to set new password. it receive key as @param,then find the
 	 * vlaue(token) for that key and set the new password
 	 * 
 	 * @param newPassword,token(key)

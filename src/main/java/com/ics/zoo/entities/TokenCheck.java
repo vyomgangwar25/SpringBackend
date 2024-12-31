@@ -1,7 +1,6 @@
 package com.ics.zoo.entities;
 
-import java.util.Date;
-
+import java.time.LocalTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -14,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +28,7 @@ import lombok.Setter;
  * @author Vyom Gangwar
  */
 @EntityListeners(AuditingEntityListener.class)
+@Builder
 @Entity
 public class TokenCheck extends CommonEntity {
 
@@ -38,6 +39,21 @@ public class TokenCheck extends CommonEntity {
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;
 
+	@Column(updatable = false)
+	@CreatedDate
+	@Temporal(TemporalType.TIME)
+	private LocalTime createdAt;
 
- 
+//	public static TokenCheckBuilder builder(String generated_token, boolean b, User existingUser) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
+//	public TokenCheck(String token, Boolean isvalid, User user) {
+//		this.token = token;
+//		this.isvalid = isvalid;
+//		this.user = user;
+//
+//	}
+
 }
