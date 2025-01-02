@@ -14,4 +14,6 @@ import com.ics.zoo.entities.Zoo;
  */
 public interface ZooRepository extends JpaRepository<Zoo, Integer> {
 	public List<Zoo> findAllByIdNot(Integer zooId);
+	public List<Zoo> findByName(String name);
+
 }

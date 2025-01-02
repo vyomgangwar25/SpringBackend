@@ -18,7 +18,9 @@ public enum ResponseEnum
 	INCORRECT_OLD_PASSWORD("Incorrect Old Password!!"),
 	TOKEN_BIT_CHANGE("Token bit change"),
 	NULL_TOKEN("Token is null"),
-	EXPIRED_TOKEN("Token is expired");
+	EXPIRED_TOKEN("Token is expired"),
+	NO_VALUE_FOUND("no value found!");
+	
 private String message;
 
 private ResponseEnum(String message) {

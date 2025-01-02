@@ -44,7 +44,6 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(NoSuchElementException.class)
 	public ResponseEntity<String> handleNullException(NoSuchElementException exception) {
-		// System.out.println(exception.getMessage());
 		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 

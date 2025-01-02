@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Random;
 import org.springframework.stereotype.Component;
 
+import com.ics.zoo.enums.ResponseEnum;
+
 /**
  * UrlConstant
  * @author Vyom Gangwar
@@ -20,7 +22,7 @@ public class UrlConstant {
 
 	public String getUrlValue(String key) {
 		if (!hm.containsKey(key)) {
-			return "no value found!!";
+			return  ResponseEnum.NO_VALUE_FOUND.getMessage();
 		}
 		String value = hm.get(key);
 		return value;

@@ -49,6 +49,11 @@ public class ZooController extends AbstractController<ZooService> {
 	public ResponseEntity<HashMap<String, Object>> list(@RequestParam Integer page, @RequestParam Integer pagesize) {
 		return getService().extract(page, pagesize);
 	}
+	
+	@GetMapping("/search")
+	public ResponseEntity<?>searchResult(@RequestBody String value ){
+		return null;
+	}
 
 	/**
 	 * this method is used to update the zoo data

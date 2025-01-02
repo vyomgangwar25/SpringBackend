@@ -16,12 +16,13 @@ import lombok.Setter;
 
 /**
  * RolePrivileges Entity
+ * 
  * @author Vyom Gangwar
  * 
- * **/
+ **/
 @Entity
 public class RolePrivileges extends CommonEntity {
-    
+
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "role_id", referencedColumnName = "id")
 	private Roles role;
@@ -30,4 +31,4 @@ public class RolePrivileges extends CommonEntity {
 	@JoinColumn(name = "privilege_id", referencedColumnName = "id")
 	private Privileges privileges;
 
-}  
+}

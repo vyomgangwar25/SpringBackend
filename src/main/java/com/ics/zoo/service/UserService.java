@@ -62,21 +62,26 @@ public class UserService extends AbstractService<UserRepository> {
 	 * @author Vyom Gangwar
 	 */
 	public ResponseEntity<?> login(LoginUserDTO userInput) {
-		User existingUser = getRepository().findByEmail(userInput.getEmail());
-		if (existingUser != null) {
-			if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
-				String generated_token = jwtutil.generateToken(existingUser);
-				LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
-				response.setToken(generated_token);
-				// TokenCheck tokenCheck = new TokenCheck(generated_token, true, existingUser);
-				TokenCheck tokencheck = TokenCheck.builder().token(generated_token).isvalid(true).user(existingUser)
-						.build();
-				tokenRepository.save(tokencheck);
-				return ResponseEntity.ok(response);
+		try {
+			User existingUser = getRepository().findByEmail(userInput.getEmail());
+			if (existingUser != null) {
+				if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
+					String generated_token = jwtutil.generateToken(existingUser);
+					LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
+					response.setToken(generated_token);
+					TokenCheck tokencheck = TokenCheck.builder().token(generated_token).isvalid(true).user(existingUser)
+							.build();
+					tokenRepository.save(tokencheck);
+					return ResponseEntity.ok(response);
+				}
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+						.body(ResponseEnum.INCORRECT_PASSWORD.getMessage());
 			}
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_PASSWORD.getMessage());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_EMAIL.getMessage());
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.INCORRECT_EMAIL.getMessage());
+
 	}
 
 	/**
@@ -89,14 +94,19 @@ public class UserService extends AbstractService<UserRepository> {
 	 */
 
 	public ResponseEntity<String> logout(String tokenHeader) {
-		if (tokenHeader != null) {
-			String token = tokenHeader.substring(7);
-			TokenCheck tokenCheck = tokenRepository.findByToken(token);
-			tokenCheck.setIsvalid(false);
-			tokenRepository.save(tokenCheck);
-			return ResponseEntity.ok(ResponseEnum.TOKEN_BIT_CHANGE.getMessage());
+		try {
+			if (tokenHeader != null) {
+				String token = tokenHeader.substring(7);
+				TokenCheck tokenCheck = tokenRepository.findByToken(token);
+				tokenCheck.setIsvalid(false);
+				tokenRepository.save(tokenCheck);
+				return ResponseEntity.ok(ResponseEnum.TOKEN_BIT_CHANGE.getMessage());
+			}
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseEnum.NOT_FOUND.getMessage());
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseEnum.NOT_FOUND.getMessage());
+
 	}
 
 	/**
@@ -110,16 +120,18 @@ public class UserService extends AbstractService<UserRepository> {
 	 */
 
 	public ResponseEntity<String> register(UserDTO userInput) {
-		if (getRepository().findByEmail(userInput.email) == null) {
-
-			User user = modelMapper.map(userInput, User.class);
-			user.setPassword(passwordEncoder.encode(userInput.getPassword()));
-			user.setRoleId(userInput.getRoleId());
-			getRepository().save(user);
-
-			return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
+		try {
+			if (getRepository().findByEmail(userInput.email) == null) {
+				User user = modelMapper.map(userInput, User.class);
+				user.setPassword(passwordEncoder.encode(userInput.getPassword()));
+				user.setRoleId(userInput.getRoleId());
+				getRepository().save(user);
+				return ResponseEntity.ok(ResponseEnum.REGISTRATION.getMessage());
+			}
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseEnum.ALREADY_EXIST.getMessage());
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseEnum.ALREADY_EXIST.getMessage());
 	}
 
 	/**
@@ -146,14 +158,11 @@ public class UserService extends AbstractService<UserRepository> {
 			User user = getRepository().findById(id).get();
 			user.setUsername(userDetails.getName());
 			user.setEmail(userDetails.getEmail());
-
-			// User updateUser =
-			// User.builder().username(userDetails.getName()).email(userDetails.getEmail()).build();
 			getRepository().save(user);
+			return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 		} catch (DataIntegrityViolationException e) {
 			throw e;
 		}
-		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
 
 	/**
@@ -176,7 +185,7 @@ public class UserService extends AbstractService<UserRepository> {
 
 	/**
 	 * this method firstly check the user with the particular email and if user is
-	 * not found then return "not found" if user is present then generate token and
+	 * not found then return "not found". if user is present then generate token and
 	 * set the token in hashmap with random key and return key as response
 	 * 
 	 * @param email
@@ -184,16 +193,20 @@ public class UserService extends AbstractService<UserRepository> {
 	 * @author Vyom Gangwar
 	 */
 	public ResponseEntity<String> forgetPassword(String email) {
-		User existUser = getRepository().findByEmail(email);
-		if (existUser == null) {
-			return ResponseEntity.status(404).body(ResponseEnum.USER_NOT_FOUND.getMessage());
-		} else {
-			String forgetpassToken = jwtutil.generateToken(existUser);
-			String key = urlConstant.urlKey(forgetpassToken);
-			String value = urlConstant.getUrlValue(key);
-			String subject = ResponseEnum.UPDATE_PASSWORD_REQUEST.getMessage();
-			emailService.sendMail(email, subject, value);
-			return ResponseEntity.ok(key);
+		try {
+			User existUser = getRepository().findByEmail(email);
+			if (existUser == null) {
+				return ResponseEntity.status(404).body(ResponseEnum.USER_NOT_FOUND.getMessage());
+			} else {
+				String forgetpassToken = jwtutil.generateToken(existUser);
+				String key = urlConstant.urlKey(forgetpassToken);
+				String value = urlConstant.getUrlValue(key);
+				String subject = ResponseEnum.UPDATE_PASSWORD_REQUEST.getMessage();
+				emailService.sendMail(email, subject, value);
+				return ResponseEntity.ok(key);
+			}
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
 	}
 
@@ -207,14 +220,18 @@ public class UserService extends AbstractService<UserRepository> {
 	 */
 
 	public ResponseEntity<String> updatePassword(String tokenHeader, PasswordDTO password) {
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!passwordEncoder.matches(password.getOldpassword(), user.getPassword())) {
-			return ResponseEntity.status(401).body(ResponseEnum.INCORRECT_OLD_PASSWORD.getMessage());
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			if (!passwordEncoder.matches(password.getOldpassword(), user.getPassword())) {
+				return ResponseEntity.status(401).body(ResponseEnum.INCORRECT_OLD_PASSWORD.getMessage());
+			}
+			String encodedPassword = passwordEncoder.encode(password.getNewpassword());
+			user.setPassword(encodedPassword);
+			getRepository().save(user);
+			return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
-		String encodedPassword = passwordEncoder.encode(password.getNewpassword());
-		user.setPassword(encodedPassword);
-		getRepository().save(user);
-		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}
 
 	/**
@@ -226,19 +243,23 @@ public class UserService extends AbstractService<UserRepository> {
 	 * @author Vyom Gangwar
 	 */
 	public ResponseEntity<String> setpassword(String tokenHeader, PasswordDTO password) {
-		if (tokenHeader != null) {
-			String key = tokenHeader.substring(7);
-			String value = urlConstant.getUrlValue(key);
-			if (value.equals("no value found!!")) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.EXPIRED_TOKEN.getMessage());
+		try {
+			if (tokenHeader != null) {
+				String key = tokenHeader.substring(7);
+				String value = urlConstant.getUrlValue(key);
+				if (value.equals(ResponseEnum.NO_VALUE_FOUND.getMessage())) {
+					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.EXPIRED_TOKEN.getMessage());
+				}
+				String userEmail = jwtutil.extractUsername(value);
+				User user = getRepository().findByEmail(userEmail);
+				String encodedPassword = passwordEncoder.encode(password.getNewpassword());
+				user.setPassword(encodedPassword);
+				getRepository().save(user);
+				urlConstant.removeKey(key);
 			}
-			String userEmail = jwtutil.extractUsername(value);
-			User user = getRepository().findByEmail(userEmail);
-			String encodedPassword = passwordEncoder.encode(password.getNewpassword());
-			user.setPassword(encodedPassword);
-			getRepository().save(user);
-			urlConstant.removeKey(key);
+			return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
-		return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 	}
 }

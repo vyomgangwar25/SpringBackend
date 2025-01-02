@@ -1,13 +1,14 @@
 package com.ics.zoo.util;
 
 import java.time.Duration;
-import java.util.ArrayList;
+ 
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,7 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ics.zoo.entities.RolePrivileges;
+ 
 import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.repository.RolePrivilegesRepository;
@@ -71,14 +72,18 @@ public class JwtUtil {
 	public String generateToken(User userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 
-		List<Integer> privilegeList = new ArrayList<>();
+		//List<Integer> privilegeList = new ArrayList<>();
 
-		List<RolePrivileges> ll = rolePrivilegeList.findByRoleId(userDetails.getRoleId());
+		//List<RolePrivileges> ll = rolePrivilegeList.findByRoleId(userDetails.getRoleId());
 
-		for (RolePrivileges roleprivileges : ll) {
-			privilegeList.add(roleprivileges.getPrivileges().getId());
-		}
+//		for (RolePrivileges roleprivileges : ll) {
+//			privilegeList.add(roleprivileges.getPrivileges().getId());
+//		}
+		List<Integer> privilegeList= rolePrivilegeList.findByRoleId(userDetails.getRoleId()).stream()
+				.map(t->t.getPrivileges().getId())
+				.collect(Collectors.toList());
 		claims.put("authority", privilegeList);
+					 
 		return createToken(claims, userDetails.getEmail());
 	}
 
@@ -97,14 +102,6 @@ public class JwtUtil {
 			if (email.equals(tokenObject.getUser().getEmail()) && !isTokenExpired(token)) {
 				return tokenObject.getUser();
 			}
-//		if (abc == null) {
-//			User oldUser = repository.findByEmail(email);
-//			if (email.equals(oldUser.getEmail()) && !isTokenExpired(token)) {
-//				return oldUser;
-//			}
-//		}
-		// final String username = extractUsername(token);
-
 		return null;
 	}
 
