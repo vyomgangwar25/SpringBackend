@@ -49,10 +49,15 @@ public class ZooController extends AbstractController<ZooService> {
 	public ResponseEntity<HashMap<String, Object>> list(@RequestParam Integer page, @RequestParam Integer pagesize) {
 		return getService().extract(page, pagesize);
 	}
-	
+
+	/**
+	 * this method is used to return the searched result.
+	 * @param search
+	 * @author Vyom Gangwar
+	 */
 	@GetMapping("/search")
-	public ResponseEntity<?>searchResult(@RequestBody String value ){
-		return null;
+	public ResponseEntity<?> searchResult(@RequestParam String text) {
+		return getService().search(text);
 	}
 
 	/**

@@ -29,7 +29,7 @@ public class Animal extends CommonEntity {
 
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "zoo_id", referencedColumnName = "id")
-	private Zoo zoo;
+	private Zoo zoo;  
 
 	public Animal(String name, String gender, Date dob, Integer zooId) {
 		this.name = name;

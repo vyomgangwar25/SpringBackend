@@ -19,8 +19,6 @@ import com.ics.zoo.dto.AnimalUpdateDTO;
 import com.ics.zoo.entities.Zoo;
 import com.ics.zoo.service.AnimalService;
 
- 
-
 /**
  * animal controller
  * 
@@ -97,7 +95,7 @@ public class AnimalController extends AbstractController<AnimalService> {
 	 * this method is used to transfer the animal from one zoo to another
 	 * 
 	 * @param animalid,zooid
-	 * @return ResponseEntity<String>  
+	 * @return ResponseEntity<String>
 	 * @author Vyom Gangwar
 	 */
 

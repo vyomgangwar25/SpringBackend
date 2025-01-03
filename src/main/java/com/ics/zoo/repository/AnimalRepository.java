@@ -8,10 +8,13 @@ import com.ics.zoo.entities.Animal;
 
 /**
  * AnimalRepository
+ * 
  * @author Vyom Gangwar
  * @since 03-Dec-2024
  */
 public interface AnimalRepository extends JpaRepository<Animal, Integer> {
 	long countByZooId(Integer zooId);
+
 	public Page<Animal> findByZooId(Integer zooId, Pageable pageable);
+
 }

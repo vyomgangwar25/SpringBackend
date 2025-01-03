@@ -41,8 +41,7 @@ public class ZooService extends AbstractService<ZooRepository> {
 	}
 
 	/**
-	 * this is used to extract the list of zoo
-	 * 
+	 * this is used to extract the list of zoo.
 	 * @param id,page and pagesize. page and pagesize is used in pagination
 	 */
 
@@ -62,16 +61,20 @@ public class ZooService extends AbstractService<ZooRepository> {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
 	}
-	
-	public ResponseEntity<?>search(String name){
+	/**
+	 * This method is used to search the zoo
+	 * @param value
+	 * @return list of zoo
+	 * 
+	 * */
+	public ResponseEntity<List<Zoo>>search(String value){
 		try {
-			List<Zoo>list=getRepository().findByName(name);
+			List<Zoo>list=getRepository().searchByZooNameOrLocation(value);
 			return  ResponseEntity.ok(list);
 		}
 		catch (Exception ex) {
 			 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-		}
-		
+		}	
 	}
 
 	/**

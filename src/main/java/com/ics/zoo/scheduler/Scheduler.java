@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
- 
 import com.ics.zoo.repository.TokenRepository;
 import com.ics.zoo.util.JwtUtil;
 
@@ -31,8 +30,8 @@ public class Scheduler {
 		try {
 			repository.findByIsvalid(false).stream().filter(t -> jwtUtil.isTokenExpired(t.getToken()))
 					.forEach(expiredToken -> repository.deleteById(expiredToken.getId()));
-		} catch (Exception ex) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 
 //		List<TokenCheck> list = repository.findByIsvalid(false);
