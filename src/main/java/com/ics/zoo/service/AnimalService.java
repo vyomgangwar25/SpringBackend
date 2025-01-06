@@ -155,6 +155,18 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 	 * @return ResponseEntity<String>
 	 * @author Vyom Gangwar
 	 */
+	
+	public ResponseEntity<?>search(String text,Integer id){
+		try {
+			 
+			List<Animal>list=getRepository().serachByNameOrGenderAndId(text,id);
+			return  ResponseEntity.ok(list);
+		}
+		catch (Exception ex) {
+			 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+		}
+		 
+	}
 
 	public ResponseEntity<String> transfer(Integer animalid, Integer zooid) {
 		try {

@@ -1,7 +1,7 @@
 package com.ics.zoo.util;
 
 import java.time.Duration;
- 
+
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,7 +16,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
- 
 import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.repository.RolePrivilegesRepository;
@@ -72,18 +71,18 @@ public class JwtUtil {
 	public String generateToken(User userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 
-		//List<Integer> privilegeList = new ArrayList<>();
+		// List<Integer> privilegeList = new ArrayList<>();
 
-		//List<RolePrivileges> ll = rolePrivilegeList.findByRoleId(userDetails.getRoleId());
+		// List<RolePrivileges> ll =
+		// rolePrivilegeList.findByRoleId(userDetails.getRoleId());
 
 //		for (RolePrivileges roleprivileges : ll) {
 //			privilegeList.add(roleprivileges.getPrivileges().getId());
 //		}
-		List<Integer> privilegeList= rolePrivilegeList.findByRoleId(userDetails.getRoleId()).stream()
-				.map(t->t.getPrivileges().getId())
-				.collect(Collectors.toList());
+		List<Integer> privilegeList = rolePrivilegeList.findByRoleId(userDetails.getRoleId()).stream()
+				.map(t -> t.getPrivileges().getId()).collect(Collectors.toList());
 		claims.put("authority", privilegeList);
-					 
+
 		return createToken(claims, userDetails.getEmail());
 	}
 
@@ -117,7 +116,9 @@ public class JwtUtil {
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
 	}
-
+	
+/**
+ * this method is uesed to check whether the token is expired or not*/
 	public Boolean isTokenExpired(String token) {
 		Boolean isExpired = extractExpiration(token).before(new Date());
 		return isExpired;

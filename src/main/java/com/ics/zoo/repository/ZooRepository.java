@@ -18,6 +18,6 @@ public interface ZooRepository extends JpaRepository<Zoo, Integer> {
 	public List<Zoo> findAllByIdNot(Integer zooId);
 	
 	@Query("SELECT  z FROM Zoo z where z.name  LIKE  %:searchValue% Or z.location LIKE %:searchValue%")
-	List<Zoo>searchByZooNameOrLocation(@Param("searchValue") String searchValue);
+public 	List<Zoo>searchByZooNameOrLocation(@Param("searchValue") String searchValue);
 
 }

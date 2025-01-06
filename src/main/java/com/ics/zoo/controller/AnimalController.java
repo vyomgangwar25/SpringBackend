@@ -52,6 +52,11 @@ public class AnimalController extends AbstractController<AnimalService> {
 			@RequestParam Integer pagesize) {
 		return getService().extract(id, page, pagesize);
 	}
+	
+	@GetMapping("/search/{id}")
+	public ResponseEntity<?> searchResult(@RequestParam String text,@PathVariable Integer id) {
+		return getService().search(text,id);
+	}
 
 	/**
 	 * this method is used to update the animal information
