@@ -9,7 +9,8 @@ public enum EndPoint {
 	LOGIN("/user/login"),
 	REGISTRATION("/user/registration"),
 	FORGET_PASSWORD("/user/forgetpassword"),
-	FETCH_ROLES("/user/fetchroles");
+	FETCH_ROLES("/user/fetchroles"),
+	TOKEN_VALIDATION("/user/refreshtoken");
 
 	private String endPoint;
 

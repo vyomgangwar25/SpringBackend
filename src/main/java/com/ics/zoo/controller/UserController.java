@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ics.zoo.dto.LoginUserDTO;
 import com.ics.zoo.dto.PasswordDTO;
+import com.ics.zoo.dto.TokenDTO;
 import com.ics.zoo.dto.UserDTO;
 import com.ics.zoo.dto.UserInfoDTO;
 import com.ics.zoo.entities.Roles;
@@ -70,6 +71,13 @@ public class UserController extends AbstractController<UserService> {
 		return getService().logout(tokenHeader);
 	}
 
+	
+	
+	@PostMapping("/refreshtoken")
+	public ResponseEntity<?>refreshtoken(@RequestBody TokenDTO refreshToken){
+		return  getService().refreshtoken(refreshToken);
+	}
+	
 	/**
 	 * this is used to fetch role
 	 * 

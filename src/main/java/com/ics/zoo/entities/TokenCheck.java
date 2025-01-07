@@ -44,6 +44,10 @@ public class TokenCheck extends CommonEntity {
 	@Temporal(TemporalType.TIME)
 	private LocalTime createdAt;
 
+	private String rtoken;
+
+ 
+
 //	public static TokenCheckBuilder builder(String generated_token, boolean b, User existingUser) {
 //		// TODO Auto-generated method stub
 //		return null;

@@ -10,10 +10,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.ics.zoo.dto.LoginResponseDTO;
 import com.ics.zoo.dto.LoginUserDTO;
 import com.ics.zoo.dto.PasswordDTO;
+import com.ics.zoo.dto.TokenDTO;
 import com.ics.zoo.dto.UserDTO;
 import com.ics.zoo.dto.UserInfoDTO;
 import com.ics.zoo.entities.Roles;
@@ -52,6 +52,9 @@ public class UserService extends AbstractService<UserRepository> {
 	@Autowired
 	private UrlConstant urlConstant;
 
+	@Autowired
+	private RefreshTokenService refreshTokenService;
+
 	/**
 	 * this method is used for login it first check if user is found in database or
 	 * not.If not found then return "user not found" else generate the token and
@@ -69,8 +72,10 @@ public class UserService extends AbstractService<UserRepository> {
 					String generated_token = jwtutil.generateToken(existingUser);
 					LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
 					response.setToken(generated_token);
+					String refreshToken = refreshTokenService.generateToken(existingUser);
+					response.setRefreshToken(refreshToken);
 					TokenCheck tokencheck = TokenCheck.builder().token(generated_token).isvalid(true).user(existingUser)
-							.build();
+							.rtoken(refreshToken).build();
 					tokenRepository.save(tokencheck);
 					return ResponseEntity.ok(response);
 				}
@@ -107,6 +112,28 @@ public class UserService extends AbstractService<UserRepository> {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
 
+	}
+	
+	/**
+	 * this is used to check the validity of token and refreshToken.
+	 * if  token is expired and refreshToken is not expired then generate new token.
+	 * if  both(token and refreshToken) are expired then redirect to login page
+	 * 
+	 * @param refreshToken
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
+
+	public ResponseEntity<?> refreshtoken(TokenDTO refreshToken) {
+		System.out.println(refreshToken.getToken());
+		TokenCheck tokenCheck = tokenRepository.findByToken(refreshToken.getToken());
+		boolean isValid = refreshTokenService.validateToken(refreshToken.getToken(), tokenCheck.getUser().getEmail());
+		if (isValid) {
+			String newToken = jwtutil.generateToken(tokenCheck.getUser());
+			return ResponseEntity.ok(newToken);
+		}
+
+		return ResponseEntity.ok("refresh token expired!!");
 	}
 
 	/**

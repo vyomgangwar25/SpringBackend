@@ -18,4 +18,5 @@ public interface TokenRepository extends JpaRepository<TokenCheck, Integer> {
 
 	public TokenCheck findByToken(String token);
 	public List<TokenCheck> findByIsvalid(Boolean value);
+	public TokenCheck findByRtoken(String rtoken);
 }
