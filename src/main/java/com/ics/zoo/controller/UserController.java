@@ -72,9 +72,13 @@ public class UserController extends AbstractController<UserService> {
 	}
 
 	
-	
+	/**
+	 * this function is used to gerenate the new jwt token if refresh token is valid
+	 * @param refreshToken
+	 * @author Vyom Gangwar
+	 * **/
 	@PostMapping("/refreshtoken")
-	public ResponseEntity<?>refreshtoken(@RequestBody TokenDTO refreshToken){
+	public ResponseEntity<String>refreshtoken(@RequestBody TokenDTO refreshToken){
 		return  getService().refreshtoken(refreshToken);
 	}
 	

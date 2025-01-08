@@ -50,7 +50,7 @@ public class RefreshTokenService {
 
 	public boolean validateToken(String token, String email) {
             TokenCheck tokenCheck= tokenRepository.findByRtoken(token);
-		if (email.equals(tokenCheck.getRtoken()) && !isTokenExpired(token)) {
+		if (email.equals(tokenCheck.getUser().getEmail()) && !isTokenExpired(token)) {
 			return true;
 		}
 		return false;

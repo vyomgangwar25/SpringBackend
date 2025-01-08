@@ -113,27 +113,28 @@ public class UserService extends AbstractService<UserRepository> {
 		}
 
 	}
-	
+
 	/**
-	 * this is used to check the validity of token and refreshToken.
-	 * if  token is expired and refreshToken is not expired then generate new token.
-	 * if  both(token and refreshToken) are expired then redirect to login page
-	 * 
+	 * this is used to check the validity of token and refreshToken. if token is
+	 * expired and refreshToken is not expired then generate new token.
+	 *  if both(token and refreshToken) are expired then throw error. 
 	 * @param refreshToken
 	 * @return ResponseEntity<String>
 	 * @author Vyom Gangwar
 	 */
 
-	public ResponseEntity<?> refreshtoken(TokenDTO refreshToken) {
-		System.out.println(refreshToken.getToken());
-		TokenCheck tokenCheck = tokenRepository.findByToken(refreshToken.getToken());
+	public ResponseEntity<String> refreshtoken(TokenDTO refreshToken) {
+		//System.out.println(refreshToken.getToken());
+		TokenCheck tokenCheck = tokenRepository.findByRtoken(refreshToken.getToken());
 		boolean isValid = refreshTokenService.validateToken(refreshToken.getToken(), tokenCheck.getUser().getEmail());
 		if (isValid) {
 			String newToken = jwtutil.generateToken(tokenCheck.getUser());
+			tokenCheck.setToken(newToken);
+			tokenRepository.save(tokenCheck);
 			return ResponseEntity.ok(newToken);
+		} else {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token expired");
 		}
-
-		return ResponseEntity.ok("refresh token expired!!");
 	}
 
 	/**
