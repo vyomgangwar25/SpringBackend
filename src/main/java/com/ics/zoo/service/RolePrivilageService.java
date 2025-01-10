@@ -10,20 +10,22 @@ import com.ics.zoo.repository.RolePrivilegesRepository;
 
 /**
  * RolePrivileges service
+ * 
  * @author Vyom Gangwar
- * */
+ */
 @Service
 public class RolePrivilageService {
-	
+
 	@Autowired
 	private RolePrivilegesRepository rolePrivilegesRepository;
-	
+
 	/**
 	 * this method set the authority
+	 * 
 	 * @param user
 	 * @return user(object)
 	 * 
-	 * ***/
+	 ***/
 
 	public UserDetails loadUserByUsername(User user) {
 		user.setAuthority(rolePrivilegesRepository.findByRoleId(user.getRoleId()).stream()

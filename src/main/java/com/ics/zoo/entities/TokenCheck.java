@@ -5,7 +5,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.JoinColumn;
@@ -39,25 +38,10 @@ public class TokenCheck extends CommonEntity {
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;
 
-	@Column(updatable = false)
 	@CreatedDate
 	@Temporal(TemporalType.TIME)
 	private LocalTime createdAt;
 
 	private String rtoken;
-
- 
-
-//	public static TokenCheckBuilder builder(String generated_token, boolean b, User existingUser) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
-//	public TokenCheck(String token, Boolean isvalid, User user) {
-//		this.token = token;
-//		this.isvalid = isvalid;
-//		this.user = user;
-//
-//	}
 
 }

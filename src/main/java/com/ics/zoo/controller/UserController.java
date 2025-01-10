@@ -125,8 +125,8 @@ public class UserController extends AbstractController<UserService> {
 	 * @author Vyom Gangwar
 	 */
 	@PostMapping("/forgetpassword")
-	public ResponseEntity<String> forgetPassword(@RequestBody String email) {
-		return getService().forgetPassword(email);
+	public ResponseEntity<String> forgetPassword(@RequestBody LoginUserDTO email) {
+		return getService().forgetPassword(email.getEmail());
 	}
 
 	/**

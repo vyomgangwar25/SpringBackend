@@ -1,5 +1,6 @@
 package com.ics.zoo.service;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import com.ics.zoo.dto.LoginResponseDTO;
 import com.ics.zoo.dto.LoginUserDTO;
 import com.ics.zoo.dto.PasswordDTO;
@@ -124,12 +126,18 @@ public class UserService extends AbstractService<UserRepository> {
 	 */
 
 	public ResponseEntity<String> refreshtoken(TokenDTO refreshToken) {
-		//System.out.println(refreshToken.getToken());
+		if(refreshToken==null)
+		{
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"refresh token not present");
+		}
+		 
+
 		TokenCheck tokenCheck = tokenRepository.findByRtoken(refreshToken.getToken());
 		boolean isValid = refreshTokenService.validateToken(refreshToken.getToken(), tokenCheck.getUser().getEmail());
 		if (isValid) {
 			String newToken = jwtutil.generateToken(tokenCheck.getUser());
 			tokenCheck.setToken(newToken);
+			tokenCheck.setCreatedAt(LocalTime.now().withNano(0));
 			tokenRepository.save(tokenCheck);
 			return ResponseEntity.ok(newToken);
 		} else {

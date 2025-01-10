@@ -41,6 +41,11 @@ public class JwtUtil {
 	@Autowired
 	private TokenRepository tokenRepository;
 
+	/**
+	 * validity of token in hours
+	 */
+	private Integer ExpirationTime = 2;
+
 	private String SECRET_KEY = "2D4A614E645267556B58703273357638792F423F4428472B4B6250655368566D";
 
 	/**
@@ -49,13 +54,13 @@ public class JwtUtil {
 	 * @param claims,userName
 	 * @author Vyom Gangwar
 	 */
-	private String createToken(Map<String, Object> claims, String userName) {
+	public String createToken(Map<String, Object> claims, String userName, Integer expirationTime, String secretKey) {
 		return Jwts.builder().setClaims(claims).setSubject(userName).setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + Duration.ofHours(2).toMillis()))
-				.signWith(generateKey(SECRET_KEY)).compact();
+				.setExpiration(new Date(System.currentTimeMillis() + Duration.ofHours(expirationTime).toMillis()))
+				.signWith(generateKey(secretKey)).compact();
 	}
 
-	private SecretKey generateKey(String secret) {
+	public SecretKey generateKey(String secret) {
 
 		byte[] decodedKey = Base64.getDecoder().decode(secret);
 
@@ -65,9 +70,7 @@ public class JwtUtil {
 		return secretKey;
 	}
 
-	/**
-	 * save the privileges and email
-	 */
+	 
 	public String generateToken(User userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 
@@ -83,7 +86,7 @@ public class JwtUtil {
 				.map(t -> t.getPrivileges().getId()).collect(Collectors.toList());
 		claims.put("authority", privilegeList);
 
-		return createToken(claims, userDetails.getEmail());
+		return createToken(claims, userDetails.getEmail(), ExpirationTime, SECRET_KEY);
 	}
 
 	/**
@@ -116,9 +119,10 @@ public class JwtUtil {
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
 	}
-	
-/**
- * this method is uesed to check whether the token is expired or not*/
+
+	/**
+	 * this method is used to check whether the token is expired or not
+	 */
 	public Boolean isTokenExpired(String token) {
 		Boolean isExpired = extractExpiration(token).before(new Date());
 		return isExpired;
@@ -133,4 +137,5 @@ public class JwtUtil {
 		Claims claims = extractAllClaims(token);
 		return claims.get("role", String.class);
 	}
+
 }
