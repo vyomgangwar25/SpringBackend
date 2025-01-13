@@ -23,7 +23,7 @@ public class RefreshTokenService {
 	private JwtUtil jwtUtil;
 
 	private String SECRET_KEY = "2D4A614E645267556B58703273357638792F423F4428472B4B6250655368588D";
-	private Integer ExpirationTime = 24;
+	private Integer ExpirationTime = 8;
 
 	public String generateToken(User userDetails) {
 		Map<String, Object> claims = new HashMap<>();

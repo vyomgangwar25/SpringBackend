@@ -130,8 +130,6 @@ public class UserService extends AbstractService<UserRepository> {
 		{
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"refresh token not present");
 		}
-		 
-
 		TokenCheck tokenCheck = tokenRepository.findByRtoken(refreshToken.getToken());
 		boolean isValid = refreshTokenService.validateToken(refreshToken.getToken(), tokenCheck.getUser().getEmail());
 		if (isValid) {
@@ -171,7 +169,7 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this method is used to fetch the list of role
+	 * this method is used to fetch the list of role.
 	 * 
 	 * @return list of role
 	 * @author Vyom Gangwar

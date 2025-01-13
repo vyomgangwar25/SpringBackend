@@ -44,7 +44,7 @@ public class JwtUtil {
 	/**
 	 * validity of token in hours
 	 */
-	private Integer ExpirationTime = 2;
+	private Integer ExpirationTime = 5;
 
 	private String SECRET_KEY = "2D4A614E645267556B58703273357638792F423F4428472B4B6250655368566D";
 
@@ -56,7 +56,7 @@ public class JwtUtil {
 	 */
 	public String createToken(Map<String, Object> claims, String userName, Integer expirationTime, String secretKey) {
 		return Jwts.builder().setClaims(claims).setSubject(userName).setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + Duration.ofHours(expirationTime).toMillis()))
+				.setExpiration(new Date(System.currentTimeMillis() + Duration.ofMinutes(expirationTime).toMillis()))
 				.signWith(generateKey(secretKey)).compact();
 	}
 
