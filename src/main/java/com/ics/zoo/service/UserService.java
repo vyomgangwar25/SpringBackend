@@ -118,20 +118,20 @@ public class UserService extends AbstractService<UserRepository> {
 
 	/**
 	 * this is used to check the validity of token and refreshToken. if token is
-	 * expired and refreshToken is not expired then generate new token.
-	 *  if both(token and refreshToken) are expired then throw error. 
+	 * expired and refreshToken is not expired then generate new token. if
+	 * both(token and refreshToken) are expired then throw error.
+	 * 
 	 * @param refreshToken
 	 * @return ResponseEntity<String>
 	 * @author Vyom Gangwar
 	 */
 
 	public ResponseEntity<String> refreshtoken(TokenDTO refreshToken) {
-		if(refreshToken==null)
-		{
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"refresh token not present");
+		if (refreshToken == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "refresh token not present");
 		}
 		TokenCheck tokenCheck = tokenRepository.findByRtoken(refreshToken.getToken());
-		boolean isValid = refreshTokenService.validateToken(refreshToken.getToken(), tokenCheck.getUser().getEmail());
+		boolean isValid = refreshTokenService.validateToken(refreshToken.getToken());
 		if (isValid) {
 			String newToken = jwtutil.generateToken(tokenCheck.getUser());
 			tokenCheck.setToken(newToken);
@@ -141,6 +141,7 @@ public class UserService extends AbstractService<UserRepository> {
 		} else {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token expired");
 		}
+		
 	}
 
 	/**
@@ -180,8 +181,8 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this method update the user it first find the user object using Id and then
-	 * update the info of that user
+	 * this method update the user.
+	 * it first find the user object using Id and then update the info .
 	 * 
 	 * @param id,userDetails
 	 * @author Vyom Gangwar
@@ -200,8 +201,8 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this method is used to find the user info it takes the token as param and
-	 * finds the user object from context then save the updated details
+	 * this method is used to find the user info. it takes the token as param and
+	 * finds the user object from context then return the  details
 	 * 
 	 * @param token
 	 * @author Vyom Gangwar
