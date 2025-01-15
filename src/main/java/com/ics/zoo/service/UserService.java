@@ -141,7 +141,7 @@ public class UserService extends AbstractService<UserRepository> {
 		} else {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token expired");
 		}
-		
+
 	}
 
 	/**
@@ -181,8 +181,8 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this method update the user.
-	 * it first find the user object using Id and then update the info .
+	 * this method update the user. it first find the user object using Id and then
+	 * update the info .
 	 * 
 	 * @param id,userDetails
 	 * @author Vyom Gangwar
@@ -202,7 +202,7 @@ public class UserService extends AbstractService<UserRepository> {
 
 	/**
 	 * this method is used to find the user info. it takes the token as param and
-	 * finds the user object from context then return the  details
+	 * finds the user object from context then return the details
 	 * 
 	 * @param token
 	 * @author Vyom Gangwar
@@ -227,14 +227,14 @@ public class UserService extends AbstractService<UserRepository> {
 	 * @return key
 	 * @author Vyom Gangwar
 	 */
-	public ResponseEntity<String> forgetPassword(String email) {
+	public ResponseEntity<?> forgetPassword(String email) {
 		try {
 			User existUser = getRepository().findByEmail(email);
 			if (existUser == null) {
 				return ResponseEntity.status(404).body(ResponseEnum.USER_NOT_FOUND.getMessage());
 			} else {
 				String forgetpassToken = jwtutil.generateToken(existUser);
-				String key = urlConstant.urlKey(forgetpassToken);
+				Integer key = urlConstant.urlKey(forgetpassToken);
 				String value = urlConstant.getUrlValue(key);
 				String subject = ResponseEnum.UPDATE_PASSWORD_REQUEST.getMessage();
 				emailService.sendMail(email, subject, value);
@@ -254,7 +254,7 @@ public class UserService extends AbstractService<UserRepository> {
 	 * @author Vyom Gangwar
 	 */
 
-	public ResponseEntity<String> updatePassword(String tokenHeader, PasswordDTO password) {
+	public ResponseEntity<String> updatePassword(PasswordDTO password) {
 		try {
 			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			if (!passwordEncoder.matches(password.getOldpassword(), user.getPassword())) {
@@ -277,21 +277,19 @@ public class UserService extends AbstractService<UserRepository> {
 	 * @return ResponseEntity<String>
 	 * @author Vyom Gangwar
 	 */
-	public ResponseEntity<String> setpassword(String tokenHeader, PasswordDTO password) {
+	public ResponseEntity<String> setpassword(Integer key, PasswordDTO password) {
 		try {
-			if (tokenHeader != null) {
-				String key = tokenHeader.substring(7);
-				String value = urlConstant.getUrlValue(key);
-				if (value.equals(ResponseEnum.NO_VALUE_FOUND.getMessage())) {
-					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.EXPIRED_TOKEN.getMessage());
-				}
-				String userEmail = jwtutil.extractUsername(value);
-				User user = getRepository().findByEmail(userEmail);
-				String encodedPassword = passwordEncoder.encode(password.getNewpassword());
-				user.setPassword(encodedPassword);
-				getRepository().save(user);
-				urlConstant.removeKey(key);
+			String value = urlConstant.getUrlValue(key);
+			if (value==null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.EXPIRED_TOKEN.getMessage());
 			}
+			String userEmail = jwtutil.extractUsername(value);
+			User user = getRepository().findByEmail(userEmail);
+			String encodedPassword = passwordEncoder.encode(password.getNewpassword());
+			user.setPassword(encodedPassword);
+			getRepository().save(user);
+			urlConstant.removeKey(key);
+
 			return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 		} catch (Exception ex) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());

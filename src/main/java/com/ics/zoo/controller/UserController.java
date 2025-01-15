@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.ics.zoo.dto.LoginUserDTO;
 import com.ics.zoo.dto.PasswordDTO;
 import com.ics.zoo.dto.TokenDTO;
@@ -19,7 +19,6 @@ import com.ics.zoo.dto.UserDTO;
 import com.ics.zoo.dto.UserInfoDTO;
 import com.ics.zoo.entities.Roles;
 import com.ics.zoo.service.UserService;
-
 import jakarta.validation.Valid;
 
 /**
@@ -32,6 +31,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/user")
 public class UserController extends AbstractController<UserService> {
+
 	/**
 	 * this method is used for login
 	 * 
@@ -71,17 +71,17 @@ public class UserController extends AbstractController<UserService> {
 		return getService().logout(tokenHeader);
 	}
 
-	
 	/**
 	 * this function is used to gerenate the new jwt token if refresh token is valid
+	 * 
 	 * @param refreshToken
 	 * @author Vyom Gangwar
-	 * **/
+	 **/
 	@PostMapping("/refreshtoken")
-	public ResponseEntity<String>refreshtoken(@RequestBody TokenDTO refreshToken){
-		return  getService().refreshtoken(refreshToken);
+	public ResponseEntity<String> refreshtoken(@RequestBody TokenDTO refreshToken) {
+		return getService().refreshtoken(refreshToken);
 	}
-	
+
 	/**
 	 * this is used to fetch role
 	 * 
@@ -125,7 +125,7 @@ public class UserController extends AbstractController<UserService> {
 	 * @author Vyom Gangwar
 	 */
 	@PostMapping("/forgetpassword")
-	public ResponseEntity<String> forgetPassword(@RequestBody LoginUserDTO email) {
+	public ResponseEntity<?> forgetPassword(@RequestBody LoginUserDTO email) {
 		return getService().forgetPassword(email.getEmail());
 	}
 
@@ -138,9 +138,8 @@ public class UserController extends AbstractController<UserService> {
 	 */
 
 	@PostMapping("/updatepassword")
-	public ResponseEntity<String> updatepassword(@RequestHeader("Authorization") String tokenHeader,
-			@Valid @RequestBody PasswordDTO password) {
-		return getService().updatePassword(tokenHeader, password);
+	public ResponseEntity<String> updatepassword(@Valid @RequestBody PasswordDTO password) {
+		return getService().updatePassword( password);
 	}
 
 	/**
@@ -152,8 +151,8 @@ public class UserController extends AbstractController<UserService> {
 	 * 
 	 */
 	@PostMapping("/setnewpassword")
-	public ResponseEntity<String> setpassword(@RequestHeader("Authorization2") String tokenHeader,
+	public ResponseEntity<String> setpassword(@Valid @RequestParam Integer tokenKey,
 			@RequestBody PasswordDTO password) {
-		return getService().setpassword(tokenHeader, password);
+		return getService().setpassword(tokenKey, password);
 	}
 }

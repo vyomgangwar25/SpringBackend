@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,13 @@ import com.ics.zoo.repository.ZooRepository;
  * 
  */
 @Service
+
+/**
+ * By default, Spring initializes all singleton beans eagerly at the application
+ * startup. when we use @Lazy it postpones the creation of the object until it
+ * is first requested.
+ **/
+@Lazy
 public class AnimalService extends AbstractService<AnimalRepository> {
 	@Autowired
 	private ZooRepository zooRepository;
@@ -145,6 +153,17 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 		return ResponseEntity.ok(zooRepository.findAllByIdNot(zooId));
 	}
 
+	/***/
+	public ResponseEntity<?> search(String text, Integer id) {
+		try {
+			List<Animal> list = getRepository().serachByNameOrGenderAndId(text, id);
+			return ResponseEntity.ok(list);
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+		}
+
+	}
+
 	/**
 	 * this method is used to transfer the animal from one zoo to another we use
 	 * animalid to find the animal object and then extract the info of the zoo in
@@ -155,19 +174,6 @@ public class AnimalService extends AbstractService<AnimalRepository> {
 	 * @return ResponseEntity<String>
 	 * @author Vyom Gangwar
 	 */
-	
-	public ResponseEntity<?>search(String text,Integer id){
-		try {
-			 
-			List<Animal>list=getRepository().serachByNameOrGenderAndId(text,id);
-			return  ResponseEntity.ok(list);
-		}
-		catch (Exception ex) {
-			 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-		}
-		 
-	}
-
 	public ResponseEntity<String> transfer(Integer animalid, Integer zooid) {
 		try {
 			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

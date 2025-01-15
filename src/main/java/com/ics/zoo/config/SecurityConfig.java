@@ -91,7 +91,8 @@ public class SecurityConfig {
 	 */
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http, ZooFilter filter) throws Exception {
-		HttpSecurity security = http.csrf(csrf -> csrf.disable()).cors(cors -> {
+		HttpSecurity security = http.csrf(csrf -> csrf.disable())
+		.cors(cors -> {
 			cors.configurationSource(corsConfigurationSource());
 		}).formLogin((form) -> form.disable())
 				.authorizeHttpRequests((requests) -> requests.requestMatchers(EndPoint.getEndPointsArray()).permitAll()

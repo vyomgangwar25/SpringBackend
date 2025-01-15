@@ -74,14 +74,6 @@ public class JwtUtil {
 	public String generateToken(User userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 
-		// List<Integer> privilegeList = new ArrayList<>();
-
-		// List<RolePrivileges> ll =
-		// rolePrivilegeList.findByRoleId(userDetails.getRoleId());
-
-//		for (RolePrivileges roleprivileges : ll) {
-//			privilegeList.add(roleprivileges.getPrivileges().getId());
-//		}
 		List<Integer> privilegeList = rolePrivilegeList.findByRoleId(userDetails.getRoleId()).stream()
 				.map(t -> t.getPrivileges().getId()).collect(Collectors.toList());
 		claims.put("authority", privilegeList);

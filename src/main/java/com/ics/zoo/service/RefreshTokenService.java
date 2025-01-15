@@ -7,8 +7,9 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
-
+import com.ics.zoo.repository.TokenRepository;
 import com.ics.zoo.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultJwtParserBuilder;
@@ -16,8 +17,8 @@ import io.jsonwebtoken.impl.DefaultJwtParserBuilder;
 @Service
 public class RefreshTokenService {
 
-//	@Autowired
-//	private TokenRepository tokenRepository;
+	@Autowired
+	private TokenRepository tokenRepository;
 
 	@Autowired
 	private JwtUtil jwtUtil;
@@ -31,8 +32,9 @@ public class RefreshTokenService {
 	}
 
 	public boolean validateToken(String token) {
+		 TokenCheck tokenCheck=tokenRepository.findByRtoken(token);
 		try {
-			if (!isTokenExpired(token)) {
+			if (!isTokenExpired(token) && (tokenCheck.getIsvalid()== false)) {
 				return true;
 			}
 		} catch (Exception ex) {

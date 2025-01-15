@@ -8,22 +8,21 @@ import com.ics.zoo.enums.ResponseEnum;
 
 /**
  * UrlConstant
+ * 
  * @author Vyom Gangwar
- * */
+ */
 @Component
 public class UrlConstant {
 
-	HashMap<String, String> hm = new HashMap<>();
-	public String urlKey(String token) {
-		String key = randomNo().toString();
+	HashMap<Integer, String> hm = new HashMap<>();
+
+	public Integer urlKey(String token) {
+		Integer key = randomNo();
 		hm.put(key, token);
 		return key;
 	}
 
-	public String getUrlValue(String key) {
-		if (!hm.containsKey(key)) {
-			return  ResponseEnum.NO_VALUE_FOUND.getMessage();
-		}
+	public String getUrlValue(Integer key) {
 		String value = hm.get(key);
 		return value;
 	}
@@ -33,9 +32,8 @@ public class UrlConstant {
 		int no = random.nextInt(99);
 		return no;
 	}
-	
-	public String removeKey(String key)
-	{
+
+	public String removeKey(Integer key) {
 		return hm.remove(key);
 	}
 
