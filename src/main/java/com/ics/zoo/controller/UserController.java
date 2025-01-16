@@ -78,7 +78,7 @@ public class UserController extends AbstractController<UserService> {
 	 * @author Vyom Gangwar
 	 **/
 	@PostMapping("/refreshtoken")
-	public ResponseEntity<String> refreshtoken(@RequestBody TokenDTO refreshToken) {
+	public ResponseEntity<String> refreshtoken(@Valid @RequestBody TokenDTO refreshToken) {
 		return getService().refreshtoken(refreshToken);
 	}
 
@@ -139,7 +139,7 @@ public class UserController extends AbstractController<UserService> {
 
 	@PostMapping("/updatepassword")
 	public ResponseEntity<String> updatepassword(@Valid @RequestBody PasswordDTO password) {
-		return getService().updatePassword( password);
+		return getService().updatePassword(password);
 	}
 
 	/**

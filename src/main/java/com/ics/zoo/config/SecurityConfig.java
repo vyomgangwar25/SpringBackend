@@ -19,6 +19,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.ics.zoo.ZooApplication;
 import com.ics.zoo.audit.AuditorAwareImpl;
+import com.ics.zoo.dto.LoginResponseDTO;
+import com.ics.zoo.entities.User;
 import com.ics.zoo.enums.EndPoint;
 import com.ics.zoo.filter.ZooFilter;
 
@@ -50,11 +52,21 @@ public class SecurityConfig {
 		return new ModelMapper();
 	}
 
+	@Bean
+	ModelMapper skipTokenMapper() {
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.typeMap(User.class, LoginResponseDTO.class).addMappings(mp -> {
+			mp.skip(LoginResponseDTO::setToken);
+		});
+		return modelMapper;
+
+	}
+
 	/**
 	 * AuditorAware bean
 	 * 
 	 * @return AuditorAwareImpl
-	 * @author Vyom Gangwar 
+	 * @author Vyom Gangwar
 	 */
 
 	@Bean
@@ -67,7 +79,7 @@ public class SecurityConfig {
 	 * corsConfigurationSource bean
 	 * 
 	 * @return source
-	 * @author Vyom Gangwar 
+	 * @author Vyom Gangwar
 	 */
 
 	@Bean
@@ -91,8 +103,7 @@ public class SecurityConfig {
 	 */
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http, ZooFilter filter) throws Exception {
-		HttpSecurity security = http.csrf(csrf -> csrf.disable())
-		.cors(cors -> {
+		HttpSecurity security = http.csrf(csrf -> csrf.disable()).cors(cors -> {
 			cors.configurationSource(corsConfigurationSource());
 		}).formLogin((form) -> form.disable())
 				.authorizeHttpRequests((requests) -> requests.requestMatchers(EndPoint.getEndPointsArray()).permitAll()

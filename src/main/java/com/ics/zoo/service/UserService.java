@@ -26,7 +26,7 @@ import com.ics.zoo.repository.RoleRepository;
 import com.ics.zoo.repository.TokenRepository;
 import com.ics.zoo.repository.UserRepository;
 import com.ics.zoo.util.JwtUtil;
-import com.ics.zoo.util.UrlConstant;
+import com.ics.zoo.util.TokenStore;
 
 /**
  * User Service
@@ -52,7 +52,7 @@ public class UserService extends AbstractService<UserRepository> {
 	private TokenRepository tokenRepository;
 
 	@Autowired
-	private UrlConstant urlConstant;
+	private TokenStore tokenStore;
 
 	@Autowired
 	private RefreshTokenService refreshTokenService;
@@ -127,9 +127,7 @@ public class UserService extends AbstractService<UserRepository> {
 	 */
 
 	public ResponseEntity<String> refreshtoken(TokenDTO refreshToken) {
-		if (refreshToken == null) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "refresh token not present");
-		}
+
 		TokenCheck tokenCheck = tokenRepository.findByRtoken(refreshToken.getToken());
 		boolean isValid = refreshTokenService.validateToken(refreshToken.getToken());
 		if (isValid) {
@@ -139,9 +137,8 @@ public class UserService extends AbstractService<UserRepository> {
 			tokenRepository.save(tokenCheck);
 			return ResponseEntity.ok(newToken);
 		} else {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token expired");
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token expired!!!!");
 		}
-
 	}
 
 	/**
@@ -157,6 +154,10 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<String> register(UserDTO userInput) {
 		try {
 			if (getRepository().findByEmail(userInput.email) == null) {
+//				User user2=modelMapper.typeMap(UserDTO.class, User.class).addMapping( mp->{
+//					m(LoginResponseDTO::setToken)
+//				});
+
 				User user = modelMapper.map(userInput, User.class);
 				user.setPassword(passwordEncoder.encode(userInput.getPassword()));
 				user.setRoleId(userInput.getRoleId());
@@ -234,8 +235,8 @@ public class UserService extends AbstractService<UserRepository> {
 				return ResponseEntity.status(404).body(ResponseEnum.USER_NOT_FOUND.getMessage());
 			} else {
 				String forgetpassToken = jwtutil.generateToken(existUser);
-				Integer key = urlConstant.urlKey(forgetpassToken);
-				String value = urlConstant.getUrlValue(key);
+				Integer key = tokenStore.Key(forgetpassToken);
+				String value = tokenStore.Value(key);
 				String subject = ResponseEnum.UPDATE_PASSWORD_REQUEST.getMessage();
 				emailService.sendMail(email, subject, value);
 				return ResponseEntity.ok(key);
@@ -279,8 +280,8 @@ public class UserService extends AbstractService<UserRepository> {
 	 */
 	public ResponseEntity<String> setpassword(Integer key, PasswordDTO password) {
 		try {
-			String value = urlConstant.getUrlValue(key);
-			if (value==null) {
+			String value = tokenStore.Value(key);
+			if (value == null) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseEnum.EXPIRED_TOKEN.getMessage());
 			}
 			String userEmail = jwtutil.extractUsername(value);
@@ -288,8 +289,7 @@ public class UserService extends AbstractService<UserRepository> {
 			String encodedPassword = passwordEncoder.encode(password.getNewpassword());
 			user.setPassword(encodedPassword);
 			getRepository().save(user);
-			urlConstant.removeKey(key);
-
+			tokenStore.removeKey(key);
 			return ResponseEntity.ok(ResponseEnum.CHANGE_PASSWORD.getMessage());
 		} catch (Exception ex) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
