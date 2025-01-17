@@ -3,6 +3,7 @@ package com.ics.zoo.config;
 import java.util.Arrays;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -16,10 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import com.ics.zoo.ZooApplication;
 import com.ics.zoo.audit.AuditorAwareImpl;
-import com.ics.zoo.dto.LoginResponseDTO;
+import com.ics.zoo.dto.UserDTO;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.enums.EndPoint;
 import com.ics.zoo.filter.ZooFilter;
@@ -37,7 +37,6 @@ public class SecurityConfig {
 	 */
 	@Bean
 	BCryptPasswordEncoder passwordEncoder() {
-
 		return new BCryptPasswordEncoder();
 	}
 
@@ -47,19 +46,33 @@ public class SecurityConfig {
 	 * @return ModelMapper
 	 * @author Vyom Gangwar
 	 */
+
+	/**
+	 * model mapper uses 3 strategies for mapping.
+	 * 
+	 * @STANDARD @LOOSE @STRICT. STANDARD:all destination property token is matched
+	 *           and at least one source token property matched.
+	 * @author Vyom
+	 */
 	@Bean
 	ModelMapper modelMapper() {
-		return new ModelMapper();
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
+		return modelMapper;
 	}
 
+	/**
+	 * customized model mappper.
+	 * mapped UserDTO object to USER object and skip id to be mapped.
+	 * 
+	 */
 	@Bean
 	ModelMapper skipTokenMapper() {
 		ModelMapper modelMapper = new ModelMapper();
-		modelMapper.typeMap(User.class, LoginResponseDTO.class).addMappings(mp -> {
-			mp.skip(LoginResponseDTO::setToken);
+		modelMapper.typeMap(UserDTO.class, User.class).addMappings(mp -> {
+			mp.skip(User::setId);
 		});
 		return modelMapper;
-
 	}
 
 	/**
@@ -71,7 +84,6 @@ public class SecurityConfig {
 
 	@Bean
 	public AuditorAware<String> auditorProvider() {
-
 		return new AuditorAwareImpl();
 	}
 

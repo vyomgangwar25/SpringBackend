@@ -34,7 +34,7 @@ public class RefreshTokenService {
 	public boolean validateToken(String token) {
 		 TokenCheck tokenCheck=tokenRepository.findByRtoken(token);
 		try {
-			if (!isTokenExpired(token) && (tokenCheck.getIsvalid()== false)) {
+			if (!isTokenExpired(token) && (tokenCheck.getIsvalid()== true)) {
 				return true;
 			}
 		} catch (Exception ex) {

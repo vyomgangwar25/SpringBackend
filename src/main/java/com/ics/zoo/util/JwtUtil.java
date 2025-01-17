@@ -70,7 +70,6 @@ public class JwtUtil {
 		return secretKey;
 	}
 
-	 
 	public String generateToken(User userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 

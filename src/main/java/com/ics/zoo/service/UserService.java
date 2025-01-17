@@ -3,6 +3,7 @@ package com.ics.zoo.service;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.ics.zoo.dto.LoginResponseDTO;
 import com.ics.zoo.dto.LoginUserDTO;
 import com.ics.zoo.dto.PasswordDTO;
@@ -57,6 +57,12 @@ public class UserService extends AbstractService<UserRepository> {
 	@Autowired
 	private RefreshTokenService refreshTokenService;
 
+//	@Autowired
+//	private ModalRepository modalRepository;
+
+	@Autowired
+	private ModelMapper skipTokenMapper;
+
 	/**
 	 * this method is used for login it first check if user is found in database or
 	 * not.If not found then return "user not found" else generate the token and
@@ -69,10 +75,14 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<?> login(LoginUserDTO userInput) {
 		try {
 			User existingUser = getRepository().findByEmail(userInput.getEmail());
+			// List<Model> model = modalRepository.findAll();
+			// Model newModel = model.get(0);
 			if (existingUser != null) {
 				if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
 					String generated_token = jwtutil.generateToken(existingUser);
 					LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
+					// User response2 = modelMapper.map(newModel, User.class);
+					// System.out.println(response2);
 					response.setToken(generated_token);
 					String refreshToken = refreshTokenService.generateToken(existingUser);
 					response.setRefreshToken(refreshToken);
@@ -88,7 +98,6 @@ public class UserService extends AbstractService<UserRepository> {
 		} catch (Exception ex) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
-
 	}
 
 	/**
@@ -113,7 +122,6 @@ public class UserService extends AbstractService<UserRepository> {
 		} catch (Exception ex) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
-
 	}
 
 	/**
@@ -137,6 +145,7 @@ public class UserService extends AbstractService<UserRepository> {
 			tokenRepository.save(tokenCheck);
 			return ResponseEntity.ok(newToken);
 		} else {
+			tokenCheck.setIsvalid(false);
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token expired!!!!");
 		}
 	}
@@ -154,11 +163,9 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<String> register(UserDTO userInput) {
 		try {
 			if (getRepository().findByEmail(userInput.email) == null) {
-//				User user2=modelMapper.typeMap(UserDTO.class, User.class).addMapping( mp->{
-//					m(LoginResponseDTO::setToken)
-//				});
 
-				User user = modelMapper.map(userInput, User.class);
+				User user = skipTokenMapper.map(userInput, User.class);
+				//User user2 = modelMapper.map(userInput, User.class);
 				user.setPassword(passwordEncoder.encode(userInput.getPassword()));
 				user.setRoleId(userInput.getRoleId());
 				getRepository().save(user);
