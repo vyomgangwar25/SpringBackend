@@ -44,6 +44,11 @@ public class UserController extends AbstractController<UserService> {
 	public ResponseEntity<?> login(@Valid @RequestBody LoginUserDTO userInput) {
 		return getService().login(userInput);
 	}
+	
+	@GetMapping("/list")
+	public ResponseEntity<?>userList(){
+		return getService().userList();
+	}
 
 	/**
 	 * this method is used to create new user

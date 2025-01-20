@@ -57,6 +57,9 @@ public class UserService extends AbstractService<UserRepository> {
 	@Autowired
 	private RefreshTokenService refreshTokenService;
 
+	@Autowired
+	private UserRepository repository;
+
 //	@Autowired
 //	private ModalRepository modalRepository;
 
@@ -75,14 +78,12 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<?> login(LoginUserDTO userInput) {
 		try {
 			User existingUser = getRepository().findByEmail(userInput.getEmail());
-			// List<Model> model = modalRepository.findAll();
-			// Model newModel = model.get(0);
+
 			if (existingUser != null) {
 				if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
 					String generated_token = jwtutil.generateToken(existingUser);
 					LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
-					// User response2 = modelMapper.map(newModel, User.class);
-					// System.out.println(response2);
+
 					response.setToken(generated_token);
 					String refreshToken = refreshTokenService.generateToken(existingUser);
 					response.setRefreshToken(refreshToken);
@@ -165,7 +166,7 @@ public class UserService extends AbstractService<UserRepository> {
 			if (getRepository().findByEmail(userInput.email) == null) {
 
 				User user = skipTokenMapper.map(userInput, User.class);
-				//User user2 = modelMapper.map(userInput, User.class);
+
 				user.setPassword(passwordEncoder.encode(userInput.getPassword()));
 				user.setRoleId(userInput.getRoleId());
 				getRepository().save(user);
@@ -206,6 +207,11 @@ public class UserService extends AbstractService<UserRepository> {
 		} catch (DataIntegrityViolationException e) {
 			throw e;
 		}
+	}
+
+	public ResponseEntity<?> userList() {
+		List<User> userList = repository.findAll();
+		return ResponseEntity.ok(userList);
 	}
 
 	/**
