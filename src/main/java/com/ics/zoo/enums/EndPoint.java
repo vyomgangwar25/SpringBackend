@@ -10,8 +10,9 @@ public enum EndPoint {
 	REGISTRATION("/user/registration"),
 	FORGET_PASSWORD("/user/forgetpassword"),
 	FETCH_ROLES("/user/fetchroles"),
-	TOKEN_VALIDATION("/user/refreshtoken");
-
+	TOKEN_VALIDATION("/user/refreshtoken"),
+	DASH("/signin/userInfo"),
+    OAUTH("/oauth2/**");
 	private String endPoint;
 
 	private EndPoint(String endPoint) {

@@ -41,18 +41,18 @@ public class SecurityConfig {
 	}
 
 	/**
-	 * ModelMapper bean
-	 * 
-	 * @return ModelMapper
-	 * @author Vyom Gangwar
-	 */
-
-	/**
 	 * model mapper uses 3 strategies for mapping.
 	 * 
 	 * @STANDARD @LOOSE @STRICT. STANDARD:all destination property token is matched
 	 *           and at least one source token property matched.
-	 * @author Vyom
+	 * @author Vyom Gangwar
+	 */
+
+	/**
+	 * ModelMapper bean
+	 * 
+	 * @return ModelMapper
+	 * @author Vyom Gangwar
 	 */
 	@Bean
 	ModelMapper modelMapper() {
@@ -62,8 +62,8 @@ public class SecurityConfig {
 	}
 
 	/**
-	 * customized model mappper.
-	 * mapped UserDTO object to USER object and skip id to be mapped.
+	 * customized model mappper. mapped UserDTO object to USER object and skip id to
+	 * be mapped.
 	 * 
 	 */
 	@Bean
@@ -97,7 +97,7 @@ public class SecurityConfig {
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+		configuration.setAllowedOrigins(Arrays.asList("http://zoo.com:3000")); // http://localhost:3000
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));
 		configuration.setAllowCredentials(true);
@@ -120,6 +120,7 @@ public class SecurityConfig {
 		}).formLogin((form) -> form.disable())
 				.authorizeHttpRequests((requests) -> requests.requestMatchers(EndPoint.getEndPointsArray()).permitAll()
 						.anyRequest().authenticated())
+				.oauth2Login(auth -> auth.defaultSuccessUrl("/signin/setInfo"))
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
 				.httpBasic(httpBasic -> httpBasic.disable());
 		return security.build();

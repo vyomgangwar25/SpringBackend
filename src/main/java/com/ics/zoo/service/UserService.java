@@ -188,6 +188,19 @@ public class UserService extends AbstractService<UserRepository> {
 		List<Roles> allroles = roleRepository.findAll();
 		return ResponseEntity.ok(allroles);
 	}
+	
+	/** 
+	 * t
+	 * 
+	 * 
+	 * Update roles */
+	public ResponseEntity<String> updateRole(Integer userId, Integer roleId) {
+		User user = getRepository().findById(userId).get();
+		user.setRoleId(roleId);
+		getRepository().save(user);
+		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
+
+	}
 
 	/**
 	 * this method update the user. it first find the user object using Id and then
