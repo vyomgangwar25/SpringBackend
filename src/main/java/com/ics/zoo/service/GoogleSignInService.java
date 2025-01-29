@@ -50,6 +50,6 @@ public class GoogleSignInService {
 			return new RedirectView(redirectUrl);
 
 		}
-		return null;
+		return new RedirectView("http://zoo.com:3000/login");
 	}
 }

@@ -23,10 +23,4 @@ public class GoogleSignInController {
 		return googleSignInService.signIn(principal.getAttribute("email"));
 	}
 
-//	@GetMapping("/userInfo")
-//	ResponseEntity<?> signIn(HttpSession session) {
-//		Object email = session.getAttribute("email");
-//		System.out.println(session.getAttribute("email"));
-//		return googleSignInService.signIn("Vyomgangwar");
-//	}
-}
+ }

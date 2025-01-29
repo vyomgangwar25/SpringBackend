@@ -12,7 +12,9 @@ public enum EndPoint {
 	FETCH_ROLES("/user/fetchroles"),
 	TOKEN_VALIDATION("/user/refreshtoken"),
 	DASH("/signin/userInfo"),
-    OAUTH("/oauth2/**");
+    OAUTH("/oauth2/**"),
+    DEPTCREATE("/department/create"),
+    DEPTLIST("/department/list/{id}");
 	private String endPoint;
 
 	private EndPoint(String endPoint) {
