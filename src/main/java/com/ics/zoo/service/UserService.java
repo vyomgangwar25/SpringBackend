@@ -83,7 +83,6 @@ public class UserService extends AbstractService<UserRepository> {
 				if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
 					String generated_token = jwtutil.generateToken(existingUser);
 					LoginResponseDTO response = modelMapper.map(existingUser, LoginResponseDTO.class);
-
 					response.setToken(generated_token);
 					String refreshToken = refreshTokenService.generateToken(existingUser);
 					response.setRefreshToken(refreshToken);
@@ -164,9 +163,7 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<String> register(UserDTO userInput) {
 		try {
 			if (getRepository().findByEmail(userInput.email) == null) {
-
 				User user = skipTokenMapper.map(userInput, User.class);
-
 				user.setPassword(passwordEncoder.encode(userInput.getPassword()));
 				user.setRoleId(userInput.getRoleId());
 				getRepository().save(user);
@@ -180,6 +177,7 @@ public class UserService extends AbstractService<UserRepository> {
 
 	/**
 	 * this method is used to fetch the list of role.
+	 * currently doesnot need this
 	 * 
 	 * @return list of role
 	 * @author Vyom Gangwar
@@ -188,12 +186,13 @@ public class UserService extends AbstractService<UserRepository> {
 		List<Roles> allroles = roleRepository.findAll();
 		return ResponseEntity.ok(allroles);
 	}
-	
-	/** 
-	 * t
+
+	/**
+	 * this method is used to update the role
 	 * 
-	 * 
-	 * Update roles */
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
 	public ResponseEntity<String> updateRole(Integer userId, Integer roleId) {
 		User user = getRepository().findById(userId).get();
 		user.setRoleId(roleId);
@@ -222,6 +221,11 @@ public class UserService extends AbstractService<UserRepository> {
 		}
 	}
 
+	/**
+	 * this method is used to return the list of all user present in database.
+	 * 
+	 * @author Vyom Gangwar
+	 */
 	public ResponseEntity<?> userList() {
 		List<User> userList = repository.findAll();
 		return ResponseEntity.ok(userList);

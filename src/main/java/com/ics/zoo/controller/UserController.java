@@ -3,10 +3,8 @@ package com.ics.zoo.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,9 +44,16 @@ public class UserController extends AbstractController<UserService> {
 	public ResponseEntity<?> login(@Valid @RequestBody LoginUserDTO userInput) {
 		return getService().login(userInput);
 	}
-	
+
+	/**
+	 * this method is used to give the list of user
+	 * 
+	 * @return user list
+	 * @author Vyom Gangwar
+	 */
+
 	@GetMapping("/list")
-	public ResponseEntity<?>userList(){
+	public ResponseEntity<?> userList() {
 		return getService().userList();
 	}
 
@@ -135,7 +140,15 @@ public class UserController extends AbstractController<UserService> {
 	public ResponseEntity<?> forgetPassword(@RequestBody LoginUserDTO email) {
 		return getService().forgetPassword(email.getEmail());
 	}
-	
+
+	/**
+	 * this method is used to update the user role
+	 * 
+	 * @param roleId
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 **/
+
 	@PutMapping("/updaterole/{roleId}")
 	public ResponseEntity<String> updateRole(@RequestParam Integer userId, @PathVariable Integer roleId) {
 
@@ -169,12 +182,12 @@ public class UserController extends AbstractController<UserService> {
 		return getService().setpassword(tokenKey, password);
 	}
 
-	@GetMapping("/info")
-	public String getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
-		String email = principal.getAttribute("email");
-		String name = principal.getAttribute("name");
-		System.out.println(email);
-		System.out.println(name);
-		return ("email--->  "+email+" ");
-	}
+//	@GetMapping("/info")
+//	public String getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
+//		String email = principal.getAttribute("email");
+//		String name = principal.getAttribute("name");
+//		System.out.println(email);
+//		System.out.println(name);
+//		return ("email--->  " + email + " ");
+//	}
 }

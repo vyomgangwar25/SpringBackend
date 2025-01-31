@@ -64,7 +64,6 @@ public class SecurityConfig {
 	/**
 	 * customized model mappper. mapped UserDTO object to USER object and skip id to
 	 * be mapped.
-	 * 
 	 */
 	@Bean
 	ModelMapper skipTokenMapper() {
@@ -86,6 +85,8 @@ public class SecurityConfig {
 	public AuditorAware<String> auditorProvider() {
 		return new AuditorAwareImpl();
 	}
+
+	 
 
 	/**
 	 * corsConfigurationSource bean
