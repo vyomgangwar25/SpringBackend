@@ -1,7 +1,7 @@
 package com.ics.zoo.util;
 
 import java.time.Duration;
-
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,19 +9,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.repository.RolePrivilegesRepository;
-
 import com.ics.zoo.repository.TokenRepository;
-
+import com.ics.zoo.service.RolePrivilageService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -40,6 +40,9 @@ public class JwtUtil {
 
 	@Autowired
 	private TokenRepository tokenRepository;
+
+	@Autowired
+	private RolePrivilageService rolePrivilageService;
 
 	/**
 	 * validity of token in hours
@@ -93,6 +96,7 @@ public class JwtUtil {
 		}
 		if (tokenObject.getIsvalid() != false)
 			if (email.equals(tokenObject.getUser().getEmail()) && !isTokenExpired(token)) {
+				loadUserByUsername(tokenObject);
 				return tokenObject.getUser();
 			}
 		return null;
@@ -120,13 +124,22 @@ public class JwtUtil {
 	}
 
 	public Date extractExpiration(String token) {
+
 		return extractClaim(token, Claims::getExpiration);
 	}
 
 	// token claim extraction:
-	public String extractRole(String token) {
-		Claims claims = extractAllClaims(token);
-		return claims.get("role", String.class);
-	}
+	public UserDetails loadUserByUsername(TokenCheck tokenObject) {
+		Claims claims = extractAllClaims(tokenObject.getToken());
+		ArrayList<Integer> newList = (ArrayList<Integer>) claims.get("authority");
+		for (Integer j : newList) {
+			tokenObject.getUser().setAuthority(newList.stream().map(a -> new SimpleGrantedAuthority("AUTHORITY_" + j))
+					.collect(Collectors.toList()));
+		}
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+				tokenObject.getUser(), null, tokenObject.getUser().getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
+		return tokenObject.getUser();
+	}
 }
