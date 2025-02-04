@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author Vyom Gangwar
  * @since 23-Sept-2024
  */
+
 @SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class })
 @EnableCaching
 @EnableScheduling
