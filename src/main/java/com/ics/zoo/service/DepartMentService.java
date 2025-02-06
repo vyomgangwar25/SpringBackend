@@ -15,9 +15,9 @@ public class DepartMentService {
 	private DepartmentRepository departmentRepository;
 
 	public ResponseEntity<String> register(Department departmentdata) {
-//		User newUser=mapper.map(userdata, User.class);
-		Department newUser = new Department(  departmentdata.getDepartmentAddress(),
-				departmentdata.getDepartmentCode(), departmentdata.getDepartmentName());
+ 
+		Department newUser = new Department(departmentdata.getDepartmentAddress(), departmentdata.getDepartmentCode(),
+				departmentdata.getDepartmentName());
 
 		departmentRepository.save(newUser);
 		return ResponseEntity.ok("user saved" + newUser);

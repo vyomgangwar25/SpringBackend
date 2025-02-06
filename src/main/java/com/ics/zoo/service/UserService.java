@@ -176,8 +176,7 @@ public class UserService extends AbstractService<UserRepository> {
 	}
 
 	/**
-	 * this method is used to fetch the list of role.
-	 * currently doesnot need this
+	 * this method is used to fetch the list of role. currently doesnot need this
 	 * 
 	 * @return list of role
 	 * @author Vyom Gangwar
@@ -185,20 +184,6 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<List<Roles>> roles() {
 		List<Roles> allroles = roleRepository.findAll();
 		return ResponseEntity.ok(allroles);
-	}
-
-	/**
-	 * this method is used to update the role
-	 * 
-	 * @return ResponseEntity<String>
-	 * @author Vyom Gangwar
-	 */
-	public ResponseEntity<String> updateRole(Integer userId, Integer roleId) {
-		User user = getRepository().findById(userId).get();
-		user.setRoleId(roleId);
-		getRepository().save(user);
-		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
-
 	}
 
 	/**
@@ -229,6 +214,19 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<?> userList() {
 		List<User> userList = repository.findAll();
 		return ResponseEntity.ok(userList);
+	}
+
+	/**
+	 * this method is used to update the role
+	 * 
+	 * @return ResponseEntity<String>
+	 * @author Vyom Gangwar
+	 */
+	public ResponseEntity<String> updateRole(Integer userId, Integer roleId) {
+		User user = getRepository().findById(userId).get();
+		user.setRoleId(roleId);
+		getRepository().save(user);
+		return ResponseEntity.ok(ResponseEnum.UPDATE.getMessage());
 	}
 
 	/**
