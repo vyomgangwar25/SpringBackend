@@ -2,7 +2,7 @@ package com.ics.zoo.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
- 
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -44,7 +44,7 @@ public class GoogleSignInService {
 			tokenRepository.save(tokencheck);
 
 			String redirectUrl = "http://zoo.com:3000/api/signin?email=" + email + "&token=" + generated_token
-					+ "&refreshToken=" + refreshToken + "&name=" + user.getUsername() + "&role=" + user.getRoleId()+""
+					+ "&refreshToken=" + refreshToken + "&name=" + user.getUsername() + "&role=" + user.getRoleId() + ""
 					+ "&id=" + user.getId();
 
 			return new RedirectView(redirectUrl);

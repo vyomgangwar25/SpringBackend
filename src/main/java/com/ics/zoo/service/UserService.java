@@ -18,11 +18,9 @@ import com.ics.zoo.dto.PasswordDTO;
 import com.ics.zoo.dto.TokenDTO;
 import com.ics.zoo.dto.UserDTO;
 import com.ics.zoo.dto.UserInfoDTO;
-import com.ics.zoo.entities.Roles;
 import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.enums.ResponseEnum;
-import com.ics.zoo.repository.RoleRepository;
 import com.ics.zoo.repository.TokenRepository;
 import com.ics.zoo.repository.UserRepository;
 import com.ics.zoo.util.JwtUtil;
@@ -36,8 +34,6 @@ import com.ics.zoo.util.TokenStore;
 
 @Service
 public class UserService extends AbstractService<UserRepository> {
-	@Autowired
-	private RoleRepository roleRepository;
 
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
@@ -60,9 +56,6 @@ public class UserService extends AbstractService<UserRepository> {
 	@Autowired
 	private UserRepository repository;
 
-//	@Autowired
-//	private ModalRepository modalRepository;
-
 	@Autowired
 	private ModelMapper skipTokenMapper;
 
@@ -78,7 +71,6 @@ public class UserService extends AbstractService<UserRepository> {
 	public ResponseEntity<?> login(LoginUserDTO userInput) {
 		try {
 			User existingUser = getRepository().findByEmail(userInput.getEmail());
-
 			if (existingUser != null) {
 				if (passwordEncoder.matches(userInput.getPassword(), existingUser.getPassword())) {
 					String generated_token = jwtutil.generateToken(existingUser);
@@ -173,17 +165,6 @@ public class UserService extends AbstractService<UserRepository> {
 		} catch (Exception ex) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
-	}
-
-	/**
-	 * this method is used to fetch the list of role. currently doesnot need this
-	 * 
-	 * @return list of role
-	 * @author Vyom Gangwar
-	 */
-	public ResponseEntity<List<Roles>> roles() {
-		List<Roles> allroles = roleRepository.findAll();
-		return ResponseEntity.ok(allroles);
 	}
 
 	/**

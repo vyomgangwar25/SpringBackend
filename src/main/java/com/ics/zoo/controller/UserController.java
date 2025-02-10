@@ -1,7 +1,5 @@
 package com.ics.zoo.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +15,6 @@ import com.ics.zoo.dto.PasswordDTO;
 import com.ics.zoo.dto.TokenDTO;
 import com.ics.zoo.dto.UserDTO;
 import com.ics.zoo.dto.UserInfoDTO;
-import com.ics.zoo.entities.Roles;
 import com.ics.zoo.service.UserService;
 import jakarta.validation.Valid;
 
@@ -92,17 +89,6 @@ public class UserController extends AbstractController<UserService> {
 	@PostMapping("/refreshtoken")
 	public ResponseEntity<String> refreshtoken(@Valid @RequestBody TokenDTO refreshToken) {
 		return getService().refreshtoken(refreshToken);
-	}
-
-	/**
-	 * this is used to fetch role
-	 * 
-	 * @return ResponseEntity<List<Roles>>
-	 * @author Vyom Gangwar
-	 */
-	@GetMapping("/fetchroles")
-	public ResponseEntity<List<Roles>> roles() {
-		return getService().roles();
 	}
 
 	/**
@@ -182,12 +168,4 @@ public class UserController extends AbstractController<UserService> {
 		return getService().setpassword(tokenKey, password);
 	}
 
-//	@GetMapping("/info")
-//	public String getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
-//		String email = principal.getAttribute("email");
-//		String name = principal.getAttribute("name");
-//		System.out.println(email);
-//		System.out.println(name);
-//		return ("email--->  " + email + " ");
-//	}
 }

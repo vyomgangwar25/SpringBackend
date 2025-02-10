@@ -21,7 +21,6 @@ import com.ics.zoo.entities.TokenCheck;
 import com.ics.zoo.entities.User;
 import com.ics.zoo.repository.RolePrivilegesRepository;
 import com.ics.zoo.repository.TokenRepository;
-import com.ics.zoo.service.RolePrivilageService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -41,8 +40,8 @@ public class JwtUtil {
 	@Autowired
 	private TokenRepository tokenRepository;
 
-	@Autowired
-	private RolePrivilageService rolePrivilageService;
+//	@Autowired
+//	private RolePrivilageService rolePrivilageService;
 
 	/**
 	 * validity of token in hours
@@ -131,6 +130,7 @@ public class JwtUtil {
 	// token claim extraction:
 	public UserDetails loadUserByUsername(TokenCheck tokenObject) {
 		Claims claims = extractAllClaims(tokenObject.getToken());
+		@SuppressWarnings("unchecked") // @SuppressWarnings is used to ignore the warning that are come from compiler.
 		ArrayList<Integer> newList = (ArrayList<Integer>) claims.get("authority");
 		for (Integer j : newList) {
 			tokenObject.getUser().setAuthority(newList.stream().map(a -> new SimpleGrantedAuthority("AUTHORITY_" + j))
@@ -139,7 +139,6 @@ public class JwtUtil {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 				tokenObject.getUser(), null, tokenObject.getUser().getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
 		return tokenObject.getUser();
 	}
 }
